@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>LAST SIGNAL: 어둠의 생존 구역</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#070b10;color:#eef6f5;font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif;touch-action:none}body{user-select:none;-webkit-user-select:none}canvas{position:fixed;inset:0;z-index:0;display:block;width:100vw;height:100dvh;touch-action:none}#hud{z-index:2}#overlay{z-index:10}#quizOverlay{position:absolute;inset:0;z-index:12;display:none;align-items:center;justify-content:center;padding:18px;background:#020608e8;pointer-events:auto}.quizDialog{width:min(520px,96vw);background:linear-gradient(145deg,#24312b,#0a1112);border:2px solid #b7c7a1;border-radius:16px;padding:22px;box-shadow:0 14px 60px #000c}.quizOptions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}.quizOption{min-height:54px;border:1px solid #a9c8a2;border-radius:10px;background:#182820;color:#f4ffe8;font-weight:900;font-size:18px;touch-action:manipulation}.quizOption:active{background:#456348}.quizFeedback{min-height:24px;color:#f2d78a;font-size:13px;margin-top:12px}#drawerOverlay{position:absolute;inset:0;z-index:9;display:none;align-items:center;justify-content:center;padding:18px;background:#020608d9;pointer-events:auto}.drawerDialog{width:min(520px,96vw);min-height:300px;max-height:85dvh;overflow:auto;background:linear-gradient(145deg,#24312b,#0a1112);border:2px solid #b7c7a1;border-radius:16px;padding:24px;box-shadow:0 14px 60px #000c}.drawerDialog h2{font-size:25px;margin:10px 0}.drawerDialog .drawerContents{min-height:110px;margin:18px 0;padding:18px;background:#ffffff0a;border:1px solid #ffffff24;border-radius:10px;font-size:15px;line-height:1.8}.drawerDialog .primary{margin-top:8px}
+#hud{position:absolute;inset:0;pointer-events:none}.top{position:absolute;top:8px;left:10px;right:10px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px}.panel{background:#0b141bdc;border:1px solid #5d7a7d;border-radius:9px;padding:7px 10px;backdrop-filter:blur(4px);font-size:12px}.big{font-weight:900;font-size:16px}.muted{color:#a8c1c2;font-size:10px}.bar{height:5px;width:110px;background:#344347;border-radius:4px;margin-top:4px;overflow:hidden}.bar span{display:block;height:100%;width:100%;background:#8ad9a1}#mission{position:absolute;top:8px;left:50%;transform:translateX(-50%);text-align:center;max-width:40vw}#mission strong{color:#f2d78a;font-size:12px}#status{font-size:10px;color:#c1d3d1;margin-top:3px}
+#stick{position:absolute;left:14px;bottom:14px;width:144px;height:144px;pointer-events:auto;touch-action:none}#stickBase{position:absolute;inset:0;border:2px solid #d0e2e577;border-radius:50%;background:#c6e2e21a}#knob{position:absolute;left:45px;top:45px;width:54px;height:54px;border-radius:50%;background:#b6e5e57a;border:2px solid #e0ffff;box-shadow:0 0 12px #b6e5e533}
+#aim{position:absolute;right:14px;bottom:14px;width:144px;height:144px;pointer-events:auto;touch-action:none}#aimBase{position:absolute;inset:0;border:2px solid #ffc8a477;border-radius:50%;background:#ffb68c12}#aimKnob{position:absolute;left:45px;top:45px;width:54px;height:54px;border-radius:50%;background:#ffba8a70;border:2px solid #ffe0c5;box-shadow:0 0 12px #ffba8a33}
+.action{position:absolute;pointer-events:auto;touch-action:none;border:1px solid #f0d6a0;background:#18201fdc;color:#fff1cb;border-radius:9px;padding:10px 12px;font-weight:850;font-size:12px}#fire{right:180px;bottom:28px;background:#542e28ed;border-color:#ffb4a2;min-width:78px;min-height:58px;box-shadow:0 3px 12px #0008}#reload{right:185px;bottom:92px}#weapon{right:176px;bottom:154px;background:#263b31;border-color:#a7d9ae}#door{right:30px;bottom:172px;display:none}#grenade{right:28px;bottom:232px;background:#4b4230;border-color:#e8c77e}#sound{right:10px;top:86px}#hint{position:absolute;bottom:5px;left:50%;transform:translateX(-50%);color:#c2d1d1;font-size:10px;white-space:nowrap;text-shadow:0 1px 3px #000}
+#overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#03080bdc;padding:18px;pointer-events:auto}.dialog{max-width:560px;width:100%;background:linear-gradient(145deg,#18252a,#0a1115);border:1px solid #819b98;border-radius:15px;padding:22px;box-shadow:0 12px 50px #0009}.tag{font-size:10px;letter-spacing:3px;color:#c5dca5;font-weight:900}h1{font-size:clamp(25px,4vw,40px);line-height:1.05;margin:8px 0 10px}p{font-size:13px;line-height:1.55;color:#cbd7d4}.list{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:13px 0}.item{background:#ffffff0a;border:1px solid #ffffff18;border-radius:8px;padding:9px;font-size:12px}.item b{color:#f0d58e}.primary{width:100%;border:0;border-radius:9px;padding:14px;background:#cce8b0;color:#142019;font-weight:950;font-size:15px}.modeRow{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}.primary small{display:block;font-size:11px;font-weight:700;margin-top:3px;opacity:.75}.primary.alt{background:#e8b0a4}.more-games{display:block;text-align:center;margin-top:12px;color:#9fdcff;font-size:13px;font-weight:800;text-decoration:none}.note{font-size:10px;color:#9db1ae}
+@media(orientation:portrait){#overlay:after{content:"태블릿을 가로로 돌리면 더 넓게 플레이할 수 있어요.";position:absolute;top:8px;left:10px;right:10px;text-align:center;color:#f2d78a;font-size:12px}#stick{width:112px;height:112px}#knob{left:32px;top:32px}#aim{width:112px;height:112px}#aimKnob{left:32px;top:32px}#fire{right:135px;bottom:25px}#reload{right:140px;bottom:84px}#door{right:18px;bottom:140px}}
+/* Phone-friendly portrait layout: keep the game playable if orientation lock is unavailable. */
+@media(orientation:portrait){
+ #mission{top:58px;max-width:48vw;padding:5px 7px}#mission strong{font-size:10px}#status{font-size:9px}
+ .top{left:5px;right:5px;top:5px;gap:4px}.panel{padding:5px 6px;font-size:10px}.big{font-size:13px}.bar{width:65px}
+ #stick{left:10px;bottom:14px;width:100px;height:100px}#knob{left:28px;top:28px;width:44px;height:44px}
+ #aim{right:10px;bottom:14px;width:100px;height:100px}#aimKnob{left:28px;top:28px;width:44px;height:44px}
+ #fire{right:116px;bottom:28px;min-width:64px;min-height:50px;padding:8px 9px}#reload{right:119px;bottom:88px;padding:8px 9px}#weapon{right:116px;bottom:145px;padding:8px 9px}#door{right:10px;bottom:124px;padding:8px 9px;max-width:110px;white-space:normal}
+ #sound{right:5px;top:112px}#grenade{right:10px;bottom:204px;padding:8px 9px}#hint{bottom:118px;max-width:92vw;white-space:normal;text-align:center;font-size:9px}
+ .dialog{padding:15px;max-height:92dvh;overflow:auto}h1{font-size:27px}p{font-size:12px}.list{gap:5px;margin:8px 0}.item{padding:7px;font-size:11px}.primary{padding:12px}
+}
+</style>
+</head>
+<body>
+<canvas id="c" aria-label="생존 슈팅 게임 화면"></canvas>
+
+<div id="hud">
+ <div class="top">
+  <div class="panel"><div class="muted">체력 · 보호 장비</div><div class="big" id="hp">100%</div><div class="bar"><span id="hpbar"></span></div></div>
+  <div id="mission" class="panel"><strong>LAST SIGNAL · 생존 작전</strong><div id="status">열쇠 확보 → 발전기 문제 → 헬기 탈출</div></div>
+  <div class="panel" style="text-align:right"><div class="muted">탄창</div><div class="big" id="ammo">권총 · 12/12</div></div>
+ </div>
+ <div id="stick"><div id="stickBase"></div><div id="knob"></div></div>
+ <button id="fire" class="action">발사</button><button id="reload" class="action">재장전 ↻</button><button id="weapon" class="action">무기 변경 ⇄</button><button id="door" class="action">문 열기</button><button id="grenade" class="action">수류탄 ×0</button>
+ <div id="aim"><div id="aimBase"></div><div id="aimKnob"></div></div>
+ <div id="hint">왼쪽 스틱 이동 · 오른쪽 스틱 조준 · 발사 · 조사 버튼</div>
+</div>
+<div id="overlay"><div class="dialog"><div class="tag">LAST SIGNAL // SURVIVAL OPERATIONS</div><h1>LAST SIGNAL<br><span style="color:#cce8b0">생존 구역</span></h1><p>정전된 마을에서 서랍을 뒤져 <b>🔑 열쇠</b>를 모으세요.<br>발전기 앞에서 <b>수학 문제</b>를 풀면 헬기가 와요. 중앙에서 5초 버티면 탈출!</p><div class="list"><div class="item">🕹️ <b>이동</b><br>왼쪽 스틱 (끝까지 밀면 달리기)</div><div class="item">🎯 <b>조준·발사</b><br>오른쪽 스틱 + 발사 버튼</div><div class="item">🗄️ <b>조사</b><br>서랍·문 앞에서 버튼 누르기</div><div class="item">⚡ <b>탈출 순서</b><br>열쇠 → 발전기 문제 → 헬기</div></div><div class="modeRow"><button id="startEasy" class="primary">🟢 초보 모드<small>열쇠 3개 · 1층만 · 적 적음</small></button><button id="start" class="primary alt">🔴 보통 모드<small>열쇠 5개 · 원래 난이도</small></button></div><p class="note" style="text-align:center;margin-bottom:0">가로 화면 추천 · 키보드: WASD 이동 · 스페이스 발사 · E 조사</p><a class="more-games" href="index.html">🎮 다른 게임들</a></div></div><div id="quizOverlay"><div class="quizDialog"><div class="tag">GENERATOR STARTUP // MATH CHECK</div><h2>발전기 시동 문제</h2><p id="quizQuestion">계산 문제</p><div id="quizOptions" class="quizOptions"></div><div id="quizFeedback" class="quizFeedback"></div><button id="quizCancel" class="primary">나중에 풀기</button></div></div>
+<div id="drawerOverlay"><div class="drawerDialog"><div class="tag">FIELD SEARCH // STORAGE</div><h2 id="drawerTitle">서랍 조사</h2><p>서랍 안을 천천히 살펴본다...</p><div id="drawerContents" class="drawerContents"></div><button id="drawerClose" class="primary">닫기 · 계속 수색</button></div></div>
+<script>
+(()=>{
+const c=document.getElementById('c'),ctx=c.getContext('2d'),$=id=>document.getElementById(id);
+let W=innerWidth,H=innerHeight,dpr=1;const darkCanvas=document.createElement('canvas');darkCanvas.width=2400;darkCanvas.height=1700;const darkCtx=darkCanvas.getContext('2d');
+function resize(){W=Math.max(1,window.visualViewport?.width||innerWidth);H=Math.max(1,window.visualViewport?.height||innerHeight);dpr=Math.min(devicePixelRatio||1,2);c.width=Math.round(W*dpr);c.height=Math.round(H*dpr);c.style.width=W+'px';c.style.height=H+'px';ctx.setTransform(dpr,0,0,dpr,0,0)}addEventListener('resize',resize);if(window.visualViewport)window.visualViewport.addEventListener('resize',resize);resize();
+const map={w:2400,h:1700};
+let walls=[
+ // 1F: compact compound around a central courtyard, with open door gaps
+ // Safehouse NW
+ {x:150,y:170,w:145,h:22},{x:375,y:170,w:145,h:22},{x:150,y:192,w:22,h:185},{x:498,y:192,w:22,h:185},{x:150,y:377,w:112,h:22},{x:388,y:377,w:132,h:22},
+ // Logistics warehouse north
+ {x:760,y:140,w:145,h:22},{x:1005,y:140,w:145,h:22},{x:760,y:162,w:22,h:205},{x:1128,y:162,w:22,h:205},{x:760,y:345,w:115,h:22},{x:1010,y:345,w:140,h:22},
+ // Apartment north-east
+ {x:1770,y:170,w:130,h:22},{x:1990,y:170,w:140,h:22},{x:1770,y:192,w:22,h:238},{x:2108,y:192,w:22,h:238},{x:1770,y:408,w:110,h:22},{x:1990,y:408,w:140,h:22},
+ // Garage west-middle
+ {x:170,y:690,w:115,h:22},{x:395,y:690,w:165,h:22},{x:170,y:712,w:22,h:210},{x:538,y:712,w:22,h:210},{x:170,y:900,w:120,h:22},{x:390,y:900,w:170,h:22},
+ // Clinic south-west
+ {x:730,y:1220,w:125,h:22},{x:955,y:1220,w:145,h:22},{x:730,y:1242,w:22,h:205},{x:1078,y:1242,w:22,h:205},{x:730,y:1425,w:115,h:22},{x:970,y:1425,w:130,h:22},
+ // Radio and security wing east-middle
+ {x:1770,y:680,w:135,h:22},{x:2025,y:680,w:125,h:22},{x:1770,y:702,w:22,h:215},{x:2128,y:702,w:22,h:215},{x:1770,y:895,w:120,h:22},{x:2010,y:895,w:140,h:22},
+ // Generator room in the south-east (door controlled by the 3 keys)
+ {x:1370,y:1090,w:380,h:32},{x:1370,y:1122,w:32,h:278},{x:1718,y:1122,w:32,h:278},{x:1370,y:1368,w:125,h:32},{x:1600,y:1368,w:150,h:32},
+ // Barricades, wrecks and cover around the courtyard
+ {x:610,y:480,w:145,h:24},{x:920,y:475,w:120,h:24},{x:1430,y:490,w:150,h:24},{x:1650,y:570,w:125,h:24},
+ {x:610,y:1000,w:135,h:24},{x:880,y:1040,w:120,h:24},{x:1160,y:1160,w:135,h:24},{x:1860,y:1050,w:145,h:24},
+ {x:430,y:1080,w:110,h:24},{x:1910,y:1250,w:125,h:24}
+];
+const groundWalls=walls;
+// Solid collision footprints for visible furniture, barriers and debris. These cannot be walked or shot through.
+const solidBlocks1=[
+ {x:215,y:235,w:70,h:36},{x:315,y:285,w:52,h:26},{x:415,y:320,w:34,h:28},
+ {x:805,y:195,w:88,h:18},{x:805,y:228,w:88,h:18},{x:990,y:195,w:92,h:18},{x:990,y:228,w:92,h:18},{x:900,y:280,w:32,h:28},{x:940,y:280,w:32,h:28},
+ {x:1940,y:280,w:65,h:38},{x:2025,y:220,w:70,h:36},{x:2020,y:340,w:60,h:26},
+ {x:255,y:755,w:130,h:58},{x:420,y:740,w:76,h:18},{x:425,y:825,w:35,h:30},
+ {x:785,y:1275,w:76,h:32},{x:785,y:1350,w:76,h:32},{x:920,y:1275,w:76,h:32},{x:955,y:1370,w:75,h:26},
+ {x:1820,y:735,w:85,h:26},{x:1930,y:735,w:85,h:26},{x:2030,y:820,w:68,h:18},
+ {x:1420,y:1305,w:80,h:26},{x:1530,y:1170,w:80,h:62},
+ {x:590,y:590,w:82,h:26},{x:840,y:570,w:95,h:24},{x:1450,y:585,w:100,h:26},{x:1650,y:620,w:80,h:25},{x:590,y:970,w:95,h:25},{x:880,y:980,w:95,h:25},{x:1450,y:1010,w:95,h:25},{x:1800,y:990,w:100,h:25}
+];
+const solidBlocks2=[{x:1820,y:225,w:95,h:32},{x:1940,y:280,w:65,h:38},{x:2025,y:220,w:70,h:36},{x:2020,y:340,w:60,h:26},{x:1815,y:225,w:70,h:30},{x:1980,y:220,w:70,h:30},{x:1830,y:315,w:65,h:28},{x:2000,y:300,w:70,h:28}];
+// Wrecks are solid obstacles: collision footprint follows their drawn vehicle bodies.
+const wreckBlocks=[[300,535,.12],[980,625,-.2],[1510,620,.15],[2050,600,-.1],[430,1010,.3],[970,1120,-.1],[1280,1030,.2],[1870,1010,-.2],[550,1510,.05],[2170,1450,.2]].map(a=>({x:a[0]-38,y:a[1]-23,w:76,h:46}));
+
+const upperWalls=[
+ {x:1770,y:170,w:130,h:22},{x:1990,y:170,w:140,h:22},
+ {x:1770,y:192,w:22,h:238},{x:2108,y:192,w:22,h:238},
+ {x:1770,y:408,w:110,h:22},{x:1990,y:408,w:140,h:22}
+];
+let floorLevel=1;
+let worldDevices=[];let ambientTraps=[];
+const stairs=[
+ {x:1915,y:365,floor:1,toFloor:2,toX:1915,toY:365,label:'아파트 2층 계단'},
+ {x:1915,y:365,floor:2,toFloor:1,toX:1915,toY:365,label:'아파트 1층 계단'}
+];
+let stairCooldown=0;let mode='normal',KEYS=5,DMG=1;
+let randomBuildings=[],randomBuildingBlocks=[],randomBuildingWalls=[],randomFurnitureBlocks=[],generatorQuiz={question:'',answer:0,options:[]};
+
+let sirenOsc=null,sirenGain=null,sirenLfo=null,ambientOsc=null,ambientGain=null,ambienceClock=0;
+let player,foes,loot,weaponDrops=[],weaponsOwned=[],bullets,ebullets,grenadeObjects=[],particles,exits,secret,signal,opened,game='menu',clock=0,fireHeld=false,move={x:0,y:0},aim={x:1,y:0},soundOn=true,audioCtx=null,lastShot=-99,noise=0,toast='',toastTime=0,seen=new Set(),roomInside=false,generatorOn=false,generatorDoorOpen=false,keysFound=0,drawers=[],extractTimer=0,waveTimer=0,stepClock=0,enemyStepClock=0,alarmTimer=0,helicopter={x:1200,y:-100,arrived:false};
+function reset(){
+ floorLevel=1;walls=groundWalls;stairCooldown=0;
+ // Every run rebuilds the randomized side-building layout, their furniture, and drawer positions.
+ randomBuildings=[];randomBuildingBlocks=[];randomBuildingWalls=[];randomFurnitureBlocks=[];
+ const fixedBuildingRects=[{x:150,y:170,w:370,h:250},{x:760,y:140,w:390,h:250},{x:1770,y:170,w:360,h:280},{x:170,y:690,w:390,h:260},{x:730,y:1220,w:370,h:250},{x:1770,y:680,w:380,h:260},{x:1370,y:1090,w:380,h:310}];
+ const candidateSites=[];
+ for(let yy=120;yy<1510;yy+=90)for(let xx=120;xx<2250;xx+=100){
+   const b={x:xx+Math.floor(Math.random()*35-17),y:yy+Math.floor(Math.random()*35-17),w:150+Math.floor(Math.random()*36),h:112+Math.floor(Math.random()*31)};
+   if(b.x<35||b.y<35||b.x+b.w>map.w-35||b.y+b.h>map.h-35)continue;
+   if(fixedBuildingRects.some(r=>b.x<r.x+r.w+45&&b.x+b.w>r.x-45&&b.y<r.y+r.h+45&&b.y+b.h>r.y-45))continue;
+   if(b.x<1370&&b.x+b.w>1010&&b.y<1000&&b.y+b.h>700)continue; // extraction pad stays clear
+   if(b.x<430&&b.y<390)continue; // player spawn stays clear
+   if(walls.some(w=>b.x<w.x+w.w+20&&b.x+b.w>w.x-20&&b.y<w.y+w.h+20&&b.y+b.h>w.y-20))continue;
+   if(solidBlocks1.some(w=>b.x<w.x+w.w+18&&b.x+b.w>w.x-18&&b.y<w.y+w.h+18&&b.y+b.h>w.y-18))continue;
+   if(wreckBlocks.some(w=>b.x<w.x+w.w+35&&b.x+b.w>w.x-35&&b.y<w.y+w.h+35&&b.y+b.h>w.y-35))continue;
+   candidateSites.push(b);
+ }
+ candidateSites.sort(()=>Math.random()-.5);
+ const buildingCount=5+Math.floor(Math.random()*3);
+ for(const b of candidateSites){if(randomBuildings.length>=buildingCount)break;if(randomBuildings.some(q=>b.x<q.x+q.w+70&&b.x+b.w>q.x-70&&b.y<q.y+q.h+70&&b.y+b.h>q.y-70))continue;
+   b.variant=Math.floor(Math.random()*4);b.doorSide=Math.floor(Math.random()*4);b.furniture=[];randomBuildings.push(b);
+   const t=10,g=36,x=b.x,y=b.y,w=b.w,h=b.h;
+   // Wall segments have a real doorway gap so the player can enter each building.
+   const add=(rx,ry,rw,rh)=>randomBuildingWalls.push({x:rx,y:ry,w:rw,h:rh});
+   if(b.doorSide===0){add(x,y,w*.40,t);add(x+w*.40+g,y,w*.60-g,t)}else add(x,y,w,t);
+   if(b.doorSide===1){add(x,y+h-t,w*.40,t);add(x+w*.40+g,y+h-t,w*.60-g,t)}else add(x,y+h-t,w,t);
+   if(b.doorSide===2){add(x,y,t,h*.40);add(x,y+h*.40+g,t,h*.60-g)}else add(x,y,t,h);
+   if(b.doorSide===3){add(x+w-t,y,t,h*.40);add(x+w-t,y+h*.40+g,t,h*.60-g)}else add(x+w-t,y,t,h);
+   const furnCount=1+Math.floor(Math.random()*3);
+   for(let fi=0;fi<furnCount;fi++){for(let tries=0;tries<25;tries++){const fw=24+Math.floor(Math.random()*24),fh=18+Math.floor(Math.random()*18),fx=x+18+Math.random()*(w-fw-36),fy=y+18+Math.random()*(h-fh-36);const ob={x:fx,y:fy,w:fw,h:fh};if(b.furniture.some(o=>ob.x<o.x+o.w+18&&ob.x+ob.w>o.x-18&&ob.y<o.y+o.h+18&&ob.y+ob.h>o.y-18))continue;if(fx<x+w*.38&&fy>y+h*.30&&fy<y+h*.72)continue;b.furniture.push(ob);randomFurnitureBlocks.push(ob);break}}
+ }
+ randomBuildingBlocks=[...randomBuildingWalls,...randomFurnitureBlocks];
+ // Fresh primary-school-level arithmetic problem and four unique answer choices each round.
+ const op=Math.floor(Math.random()*3);let a,b,sign,answer;if(op===0){a=rand(12,48)|0;b=rand(11,39)|0;sign='+';answer=a+b}else if(op===1){a=rand(25,79)|0;b=rand(5,Math.min(24,a-1))|0;sign='−';answer=a-b}else{a=rand(2,9)|0;b=rand(2,9)|0;sign='×';answer=a*b}const options=new Set([answer]);while(options.size<4){const delta=(Math.floor(Math.random()*15)+1)*(Math.random()<.5?-1:1);options.add(Math.max(0,answer+delta))}generatorQuiz={question:`${a} ${sign} ${b} = ?`,answer,options:[...options].sort(()=>Math.random()-.5)};
+ grenadeObjects=[];alarmTimer=0;worldDevices=[{x:900,y:620,floor:1,type:'alarm',used:false,label:'도로 경보 함정'},{x:680,y:1140,floor:1,type:'cache',used:false,label:'응급 보급함'},{x:1430,y:720,floor:1,type:'emp',used:false,label:'EMP 방출기'}];ambientTraps=[{x:520,y:520,used:false,cd:0},{x:1120,y:590,used:false,cd:0},{x:1740,y:520,used:false,cd:0},{x:760,y:1040,used:false,cd:0},{x:1370,y:880,used:false,cd:0},{x:2200,y:780,used:false,cd:0},{x:1220,y:1515,used:false,cd:0}];player={x:335,y:270,r:8,hp:100,ammo:12,magSize:12,reloading:0,angle:0,speed:205,med:0,fuse:false,signal:false,inv:0,weapon:'pistol',grenades:0,armor:0,terminalUsed:false,radioUsed:false};
+ weaponsOwned=['pistol'];
+ foes=[];
+ drawers=[];
+ // Two to three drawers per randomly placed building; every drawer is inside a building.
+ let drawerIndex=1;
+ for(const bld of randomBuildings){const target=2+(Math.random()<.35?1:0);for(let di=0;di<target;di++){
+   let pos=null;for(let tries=0;tries<180&&!pos;tries++){const x=bld.x+20+Math.random()*(bld.w-40),y=bld.y+20+Math.random()*(bld.h-40);const box={x:x-19,y:y-13,w:38,h:26};const inFurniture=bld.furniture.some(f=>box.x<f.x+f.w+5&&box.x+box.w>f.x-5&&box.y<f.y+f.h+5&&box.y+box.h>f.y-5);const tooClose=drawers.some(q=>q.floor===1&&Math.hypot(q.x-x,q.y-y)<52);const tooCloseWall=randomBuildingWalls.some(w=>rectHit(x,y,23,w));if(!inFurniture&&!tooClose&&!tooCloseWall)pos={x,y}}
+   if(pos)drawers.push({x:pos.x,y:pos.y,floor:1,found:false,label:`폐허 ${randomBuildings.indexOf(bld)+1} 수납장 ${drawerIndex++}`,kind:'empty',building:randomBuildings.indexOf(bld)});
+ }}
+ // Apartment upstairs drawers remain inside the apartment's second floor.
+ const upperDrawerSpots=[[1850,375],[1920,375],[1990,375],[2060,375]];
+ if(mode!=='easy')upperDrawerSpots.forEach((p,i)=>drawers.push({x:p[0],y:p[1],floor:2,found:false,label:['아파트 2층 협탁','아파트 2층 옷장','아파트 2층 보관함','아파트 2층 장비함'][i],kind:'empty'}));
+ // Shuffle contents on every new run: exactly five keys, plus a varied mix of useful and empty drawers.
+ drawers.forEach(q=>q.kind='empty');const upperKey=drawers.filter(q=>q.floor===2).sort(()=>Math.random()-.5)[0];if(upperKey&&KEYS>=5)upperKey.kind='key';const lowerPool=drawers.filter(q=>q.floor===1);const lowerKeys=(KEYS>=5?lowerPool.sort(()=>Math.random()-.5):lowerPool.sort((a,b)=>d(a,{x:335,y:270})-d(b,{x:335,y:270})).slice(0,5).sort(()=>Math.random()-.5)).slice(0,KEYS>=5?4:KEYS);lowerKeys.forEach(q=>q.kind='key');const nonKeys=drawers.filter(q=>q.kind!=='key').sort(()=>Math.random()-.5);nonKeys.forEach((q,i)=>{const roll=Math.random();q.kind=roll<.24?'med':roll<.42?'grenade':roll<.55?'armor':roll<.68?'ammo':'empty'});
+ loot=[];const gunSpots=[[650,420,1],[850,550,1],[1260,430,1],[1550,650,1],[1650,950,1],[2020,600,1],[610,900,1],[850,1100,1],[1250,980,1],[1850,1000,1],[2100,1160,1],[650,1500,1],[1845,320,2],[2010,320,2],[1880,285,2]].filter(g=>mode!=='easy'||g[2]===1).sort(()=>Math.random()-.5);weaponDrops=[{x:gunSpots[0][0],y:gunSpots[0][1],floor:gunSpots[0][2],type:'smg',got:false,label:'기관단총'},{x:gunSpots[1][0],y:gunSpots[1][1],floor:gunSpots[1][2],type:'shotgun',got:false,label:'산탄총'},{x:gunSpots[2][0],y:gunSpots[2][1],floor:gunSpots[2][2],type:'rifle',got:false,label:'돌격소총'}];bullets=[];ebullets=[];grenadeObjects=[];particles=[];exits={x:1200,y:850,r:58};helicopter={x:1200,y:-100,arrived:false};secret={x:650,y:930,open:false};signal={x:2030,y:350};opened=false;generatorOn=false;generatorDoorOpen=false;keysFound=0;clock=0;noise=0;extractTimer=0;waveTimer=mode==='easy'?10:3;toast=`서랍을 수색해 열쇠 ${KEYS}개를 찾아라`;toastTime=3;seen.clear();move={x:0,y:0};aim={x:1,y:0};fireHeld=false;player.angle=0;
+}
+function d(a,b){return Math.hypot(a.x-b.x,a.y-b.y)}
+function rectHit(x,y,r,w){let px=Math.max(w.x,Math.min(x,w.x+w.w)),py=Math.max(w.y,Math.min(y,w.y+w.h));return (x-px)**2+(y-py)**2<r*r}
+function blocked(x,y,r){if(x<r||y<r||x>map.w-r||y>map.h-r)return true;const props=floorLevel===1?solidBlocks1:solidBlocks2;return walls.some(w=>rectHit(x,y,r,w))||props.some(w=>rectHit(x,y,r,w))||(floorLevel===1&&randomBuildingBlocks.some(w=>rectHit(x,y,r,w)))||(floorLevel===1&&wreckBlocks.some(w=>rectHit(x,y,r,w)))||(!generatorDoorOpen&&rectHit(x,y,r,{x:1495,y:1368,w:105,h:32}))||(!secret.open&&x>615&&x<685&&y>895&&y<965)}
+function moveObj(o,dx,dy){const steps=Math.max(1,Math.ceil(Math.max(Math.abs(dx),Math.abs(dy))/4)),sx=dx/steps,sy=dy/steps;for(let i=0;i<steps;i++){if(!blocked(o.x+sx,o.y,o.r))o.x+=sx;if(!blocked(o.x,o.y+sy,o.r))o.y+=sy}}
+function notify(t){toast=t;toastTime=2.7}
+function beep(freq=180,dur=.07,type='square',vol=.035){if(!soundOn)return;try{audioCtx=audioCtx||new(window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume();let osc=audioCtx.createOscillator(),gain=audioCtx.createGain();osc.type=type;osc.frequency.setValueAtTime(freq,audioCtx.currentTime);gain.gain.setValueAtTime(vol,audioCtx.currentTime);gain.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+dur);osc.connect(gain);gain.connect(audioCtx.destination);osc.start();osc.stop(audioCtx.currentTime+dur)}catch(e){}}
+function pickupSound(kind){if(kind==='key'){beep(920,.08,'sine',.045);setTimeout(()=>beep(1240,.12,'sine',.04),85)}else if(kind==='med'){beep(520,.07,'triangle',.035);setTimeout(()=>beep(760,.12,'sine',.035),80)}else if(kind==='grenade'){beep(240,.09,'square',.04);setTimeout(()=>beep(390,.14,'triangle',.04),90)}else if(kind==='armor'){beep(180,.11,'square',.045);setTimeout(()=>beep(330,.16,'triangle',.04),100)}else if(kind==='weapon'){beep(310,.07,'square',.04);setTimeout(()=>beep(620,.1,'triangle',.04),70)}else{beep(160,.12,'triangle',.025)}}
+function ensureAudio(){if(!soundOn)return null;try{audioCtx=audioCtx||new(window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume();return audioCtx}catch(e){return null}}
+function startSiren(){const ac=ensureAudio();if(!ac||sirenOsc)return;try{sirenOsc=ac.createOscillator();sirenGain=ac.createGain();sirenLfo=ac.createOscillator();const lfoGain=ac.createGain();sirenOsc.type='sawtooth';sirenOsc.frequency.setValueAtTime(520,ac.currentTime);sirenOsc.frequency.linearRampToValueAtTime(820,ac.currentTime+.75);sirenOsc.frequency.linearRampToValueAtTime(520,ac.currentTime+1.5);sirenOsc.frequency.linearRampToValueAtTime(820,ac.currentTime+2.25);sirenLfo.type='sine';sirenLfo.frequency.value=.7;lfoGain.gain.value=190;sirenLfo.connect(lfoGain);lfoGain.connect(sirenOsc.frequency);sirenGain.gain.setValueAtTime(.0001,ac.currentTime);sirenGain.gain.linearRampToValueAtTime(.10,ac.currentTime+.15);sirenOsc.connect(sirenGain);sirenGain.connect(ac.destination);sirenOsc.start();sirenLfo.start()}catch(e){stopSiren()}}
+function stopSiren(){try{if(sirenOsc){sirenOsc.stop();sirenOsc.disconnect()}if(sirenLfo){sirenLfo.stop();sirenLfo.disconnect()}if(sirenGain)sirenGain.disconnect()}catch(e){}sirenOsc=sirenGain=sirenLfo=null}
+function horrorSting(){if(!soundOn)return;beep(68,.8,'sawtooth',.055);setTimeout(()=>beep(53,.7,'sine',.045),170);setTimeout(()=>beep(92,.35,'triangle',.03),440)}
+function spatialGainPan(x,y,base=1){const ac=ensureAudio();if(!ac)return null;const dx=x-player.x,dy=y-player.y,dist=Math.hypot(dx,dy),vol=base*Math.max(.025,1-dist/1500);let g=ac.createGain();g.gain.setValueAtTime(vol,ac.currentTime);let out=g;if(ac.createStereoPanner){let pan=ac.createStereoPanner();pan.pan.setValueAtTime(Math.max(-1,Math.min(1,dx/500)),ac.currentTime);g.connect(pan);out=pan}out.connect(ac.destination);return {ac,g,out,vol}}
+function gunshotAt(x,y,kind='rifle',base=1){const node=spatialGainPan(x,y,base);if(!node)return;const {ac,g}=node,now=ac.currentTime;try{const dur=kind==='sniper'?.34:kind==='shotgun'?.28:kind==='heavy'?.32:.23;let n=Math.floor(ac.sampleRate*dur),buf=ac.createBuffer(1,n,ac.sampleRate),data=buf.getChannelData(0);for(let i=0;i<n;i++){let t=i/n;data[i]=(Math.random()*2-1)*Math.pow(1-t,kind==='sniper'?4:3.2)}let src=ac.createBufferSource(),filter=ac.createBiquadFilter(),env=ac.createGain();src.buffer=buf;filter.type='lowpass';filter.frequency.setValueAtTime(kind==='sniper'?4200:kind==='shotgun'?3200:2600,now);filter.frequency.exponentialRampToValueAtTime(140,now+dur);env.gain.setValueAtTime(kind==='sniper'?.65:kind==='heavy'?.8:.72,now);env.gain.exponentialRampToValueAtTime(.001,now+dur);src.connect(filter);filter.connect(env);env.connect(g);src.start(now);src.stop(now+dur);
+let osc=ac.createOscillator(),og=ac.createGain();osc.type='sawtooth';let low=kind==='sniper'?72:kind==='heavy'?58:kind==='shotgun'?88:105;osc.frequency.setValueAtTime(low*1.7,now);osc.frequency.exponentialRampToValueAtTime(low*.55,now+.13);og.gain.setValueAtTime(kind==='heavy'?.36:.28,now);og.gain.exponentialRampToValueAtTime(.001,now+.19);osc.connect(og);og.connect(g);osc.start(now);osc.stop(now+.2);
+// Short bright muzzle crack layered over the low report.
+let crack=ac.createOscillator(),cg=ac.createGain();crack.type='triangle';crack.frequency.setValueAtTime(kind==='sniper'?1800:kind==='shotgun'?1150:1450,now);crack.frequency.exponentialRampToValueAtTime(260,now+.035);cg.gain.setValueAtTime(.14,now);cg.gain.exponentialRampToValueAtTime(.001,now+.045);crack.connect(cg);cg.connect(g);crack.start(now);crack.stop(now+.05);
+// Small outdoor reflection gives the shot a little space without drowning out footsteps.
+let echo=ac.createGain(),delay=ac.createDelay(.25);delay.delayTime.setValueAtTime(.085,now);echo.gain.setValueAtTime(.12,now);echo.gain.exponentialRampToValueAtTime(.001,now+.24);g.connect(delay);delay.connect(echo);echo.connect(ac.destination);
+}catch(e){}}
+function gunshot(){gunshotAt(player.x,player.y,'rifle',1.15)}
+function footstepAt(x,y,base=.15){const node=spatialGainPan(x,y,base);if(!node)return;const {ac,g}=node,now=ac.currentTime;try{let n=Math.floor(ac.sampleRate*.075),buf=ac.createBuffer(1,n,ac.sampleRate),data=buf.getChannelData(0);for(let i=0;i<n;i++)data[i]=(Math.random()*2-1)*(1-i/n);let src=ac.createBufferSource(),f=ac.createBiquadFilter(),env=ac.createGain();src.buffer=buf;f.type='lowpass';f.frequency.setValueAtTime(240,now);f.frequency.exponentialRampToValueAtTime(90,now+.07);env.gain.setValueAtTime(.22,now);env.gain.exponentialRampToValueAtTime(.001,now+.075);src.connect(f);f.connect(env);env.connect(g);src.start(now);src.stop(now+.08);let th=ac.createOscillator(),tg=ac.createGain();th.type='sine';th.frequency.setValueAtTime(95,now);th.frequency.exponentialRampToValueAtTime(45,now+.055);tg.gain.setValueAtTime(.09,now);tg.gain.exponentialRampToValueAtTime(.001,now+.06);th.connect(tg);tg.connect(g);th.start(now);th.stop(now+.065)}catch(e){}}
+
+const WEAPONS={pistol:{name:'권총',mag:12,damage:23,delay:.30,speed:700,spread:0,pellets:1},smg:{name:'기관단총',mag:30,damage:13,delay:.085,speed:735,spread:.055,pellets:1},rifle:{name:'돌격소총',mag:20,damage:29,delay:.19,speed:790,spread:.025,pellets:1},shotgun:{name:'산탄총',mag:6,damage:14,delay:.58,speed:590,spread:.23,pellets:8}};
+function weaponInfo(){return WEAPONS[player.weapon]||WEAPONS.pistol}
+function equipWeapon(type){const w=WEAPONS[type];if(!w)return;player.weapon=type;player.magSize=w.mag;player.ammo=w.mag;player.reloading=0;fireHeld=false;notify(`${w.name} 장착 · 탄창 ${w.mag}발`);beep(620,.09,'triangle')}
+function cycleWeapon(){if(weaponsOwned.length<2){notify('다른 총은 맵에서 파밍할 수 있어.');return}let i=weaponsOwned.indexOf(player.weapon);equipWeapon(weaponsOwned[(i+1)%weaponsOwned.length])}
+function fire(){if(game!=='play'||player.reloading>0)return;const w=weaponInfo();if(clock-lastShot<w.delay)return;if(player.ammo<=0){notify('탄창이 비었다! 재장전 버튼을 눌러.');return}
+ // Mobile aim assist: if an enemy is already close to the reticle direction, gently snap the shot toward it.
+ let a=player.angle;let best=null,bestDiff=.22;for(const e of foes){if(e.floor!==floorLevel)continue;const dx=e.x-player.x,dy=e.y-player.y,dist=Math.hypot(dx,dy);if(dist>620||dist<1)continue;const target=Math.atan2(dy,dx),diff=Math.abs(Math.atan2(Math.sin(target-a),Math.cos(target-a)));if(diff<bestDiff){bestDiff=diff;best={target,dist}}}if(best){const blend=best.dist<260?.82:.62;const delta=Math.atan2(Math.sin(best.target-a),Math.cos(best.target-a));a+=delta*blend;}player.ammo--;for(let k=0;k<w.pellets;k++){let aa=a+(Math.random()-.5)*w.spread;let ox=player.x+Math.cos(aa)*12,oy=player.y+Math.sin(aa)*12;bullets.push({x:ox,y:oy,px:ox,py:oy,vx:Math.cos(aa)*w.speed,vy:Math.sin(aa)*w.speed,life:.9,damage:w.damage})}lastShot=clock;noise=1;gunshot();for(let i=0;i<3;i++)particles.push({x:player.x+Math.cos(a)*13,y:player.y+Math.sin(a)*13,vx:Math.cos(a)*rand(30,100)+rand(-20,20),vy:Math.sin(a)*rand(30,100)+rand(-20,20),life:.12,color:'#ffd58b'});if(player.ammo===0)notify('탄창 비었음 · 재장전 필요')}
+function rand(a,b){return a+Math.random()*(b-a)}
+function rollEnemyType(){const r=Math.random();if(mode==='easy'&&r<.03)return 'scout';if(r<.016)return 'stalker';if(r<.030)return 'warden';if(r<.105)return 'runner';if(r<.175)return 'spitter';return ['rifle','scout','shotgun','missile','heavy'][Math.floor(Math.random()*5)]}
+function enemyStats(type){return type==='stalker'?{hp:138,r:16,sp:96}:type==='warden'?{hp:190,r:19,sp:34}:type==='runner'?{hp:42,r:12,sp:94}:type==='spitter'?{hp:68,r:14,sp:39}:type==='heavy'?{hp:112,r:16,sp:50}:type==='shotgun'?{hp:78,r:14,sp:54}:type==='sniper'?{hp:78,r:14,sp:40}:type==='missile'?{hp:85,r:15,sp:42}:{hp:52,r:14,sp:rand(38,65)}}
+function reload(){if(game!=='play')return;if(player.reloading>0){notify('재장전 중...');return}if(player.ammo===player.magSize){notify('탄창이 이미 가득 찼어.');return}player.reloading=player.weapon==='shotgun'?2.0:1.45;fireHeld=false;notify(`재장전 중... ${player.reloading.toFixed(1)}초`);beep(260,.12,'triangle')}
+function throwGrenade(){if(game!=='play')return;if((player.grenades||0)<=0){notify('수류탄이 없다. 서랍을 더 찾아봐.');return}player.grenades--;const a=player.angle;grenadeObjects.push({x:player.x+Math.cos(a)*22,y:player.y+Math.sin(a)*22,vx:Math.cos(a)*310,vy:Math.sin(a)*310,fuse:1.05,floor:floorLevel});notify(`수류탄 투척! 남은 수류탄 ${player.grenades}개`);beep(300,.08,'triangle')}
+function nearest(){let b=null,bd=Infinity;for(let e of foes){let q=d(player,e);if(q<bd){bd=q;b=e}}return b}
+function camera(){return {x:Math.max(0,Math.min(Math.max(0,map.w-W),player.x-W/2)),y:Math.max(0,Math.min(Math.max(0,map.h-H),player.y-H/2))}}
+function inHouse(){return player.x>172&&player.x<498&&player.y>192&&player.y<377}
+function showGeneratorQuiz(){
+ $('quizQuestion').textContent=generatorQuiz.question;
+ $('quizFeedback').textContent='정답을 4개 보기 중에서 골라 줘.';
+ const box=$('quizOptions');box.innerHTML='';generatorQuiz.options.forEach((value,i)=>{const btn=document.createElement('button');btn.className='quizOption';btn.textContent=['A','B','C','D'][i]+'.  '+value;btn.onclick=()=>{if(value===generatorQuiz.answer){$('quizOverlay').style.display='none';generatorOn=true;helicopter={x:1200,y:-100,arrived:false};notify('정답! 발전기 가동! 마을 조명과 경보가 켜졌다. 헬기가 중앙으로 접근한다!');beep(260,.35,'sawtooth');setTimeout(()=>beep(420,.45,'sawtooth',.06),220);setTimeout(()=>beep(620,.5,'sawtooth',.05),520)}else{$('quizFeedback').textContent='아쉽지만 오답이야. 다시 계산해서 골라 봐.';beep(145,.2,'triangle',.045)}};box.appendChild(btn)});
+ $('quizOverlay').style.display='flex';
+}
+$('quizCancel').onclick=()=>{$('quizOverlay').style.display='none';notify('발전기 시동을 보류했다. 준비되면 다시 도전해.')} ;
+function interact(){
+ const stair=stairs.find(q=>q.floor===floorLevel&&d(player,q)<36);if(stair&&mode!=='easy'&&stairCooldown<=0){floorLevel=stair.toFloor;walls=floorLevel===1?groundWalls:upperWalls;player.x=stair.toX;player.y=stair.toY;move={x:0,y:0};aim={x:1,y:0};fireHeld=false;bullets=[];ebullets=[];stairCooldown=.55;notify(floorLevel===2?'아파트 2층에 도착! 서랍과 장비를 찾아봐.':'1층으로 내려왔다.');beep(480,.12,'sine');return}
+ const drawer=drawers.find(q=>q.floor===floorLevel&&!q.found&&d(player,q)<50);
+ if(drawer){drawer.found=true;let contents='';const flavor=['서랍 레일이 끼익— 하고 울린다. 안쪽에는 오래된 먼지만 쌓여 있다.','손전등 불빛 아래 바랜 메모가 보인다. 글씨는 물에 번져 읽을 수 없다.','누군가 급하게 뒤진 흔적이 있다. 부서진 플라스틱 조각이 손끝에 걸린다.','서랍 안쪽에서 금속이 달그락거린다. 바깥 복도에서 발소리도 들린다.','곰팡내와 젖은 종이 냄새가 올라온다. 남은 물건을 확인한다.','테이프가 붙은 작은 칸막이를 발견했다. 안을 조심스럽게 살펴본다.'];const detail=flavor[Math.floor(Math.random()*flavor.length)];if(drawer.kind==='key'){keysFound++;contents=`🔑 열쇠를 찾았다!<br>열쇠 ${keysFound}/${KEYS}<br><br>${detail}<br><br>발전기실 잠금장치에 맞는 열쇠다.`;pickupSound('key')}else if(drawer.kind==='med'){player.hp=Math.min(100,player.hp+24);contents=`🩹 의료품 발견<br>체력을 회복했다.<br><br>${detail}`;pickupSound('med')}else if(drawer.kind==='supply'){player.hp=Math.min(100,player.hp+25);contents='🩹 실용 비상 키트: 체력 +25';beep(620,.12,'sine')}else if(drawer.kind==='grenade'){player.grenades=(player.grenades||0)+1;contents=`💣 특수 아이템: 수류탄 획득!<br>수류탄 ${player.grenades}개<br><br>${detail}<br><br>수류탄 버튼으로 던지면 주변 적에게 피해를 준다.`;pickupSound('grenade')}else if(drawer.kind==='ammo'){player.hp=Math.min(100,player.hp+12);contents='🩹 작은 의료품 발견!<br>체력 +12';beep(540,.12,'sine')}else if(drawer.kind==='armor'){player.armor=3;contents=`🛡️ 특수 아이템: 방탄 조끼 획득!<br>다음 공격 3회의 피해를 줄여준다.<br><br>${detail}`;pickupSound('armor')}else{contents=`비어 있다…<br><br>${detail}<br><br>쓸 만한 것은 없다. 다른 서랍을 찾아보자.`;pickupSound('empty')}$('drawerTitle').textContent=drawer.label;$('drawerContents').innerHTML=contents;$('drawerOverlay').style.display='flex';notify(drawer.label+' 조사 완료');return}
+const device=worldDevices.find(q=>q.floor===floorLevel&&!q.used&&d(player,q)<34);
+ if(device){device.used=true;if(device.type==='alarm'){alarmTimer=7;noise=5;startSiren();horrorSting();for(let i=0;i<7;i++){const a=Math.random()*Math.PI*2,rr=rand(260,390),sx=Math.max(45,Math.min(map.w-45,player.x+Math.cos(a)*rr)),sy=Math.max(45,Math.min(map.h-45,player.y+Math.sin(a)*rr)),type=rollEnemyType(),st=enemyStats(type);foes.push({x:sx,y:sy,floor:floorLevel,type,hp:st.hp,r:st.r,sp:st.sp,cd:rand(.45,1.1),alert:true})}notify('🚨 경보 함정 발동! 사이렌이 울리고 적 7명이 몰려온다!');beep(720,.35,'sawtooth');setTimeout(()=>beep(720,.35,'sawtooth'),420);setTimeout(()=>beep(720,.35,'sawtooth'),840)}else if(device.type==='cache'){player.hp=Math.min(100,player.hp+40);player.armor=3;notify('응급 보급함: 체력 최대 40 회복 · 방탄 효과 3회');beep(680,.16,'sine')}else if(device.type==='emp'){for(const e of foes.filter(e=>e.floor===floorLevel))e.stun=6;ebullets=ebullets.filter(b=>b.floor!==floorLevel);notify('EMP 방출! 현재 층의 적들이 6초 동안 무력화됐다.');beep(170,.3,'triangle')}return}
+ if(floorLevel===1&&d(player,{x:1570,y:1200})<78){if(!generatorDoorOpen){notify(`발전기실 문이 잠겨 있다. 열쇠 ${keysFound}/${KEYS}개를 모아 문을 열어라.`);return}if(!generatorOn){showGeneratorQuiz();return}else notify('발전기는 이미 가동 중이다.');return}
+ if(floorLevel===1&&d(player,{x:1550,y:1390})<75){if(!generatorDoorOpen){if(keysFound<KEYS){notify(`발전기실 잠금: 열쇠가 ${KEYS-keysFound}개 더 필요하다. (${keysFound}/${KEYS})`);beep(150,.12,'triangle');return}generatorDoorOpen=true;notify(`열쇠 ${KEYS}개 확인! 발전기실 문이 열렸다.`);beep(420,.12,'sine')}else notify('발전기실 문은 이미 열려 있다.');return}
+ if(floorLevel===1&&d(player,exits)<70){if(keysFound>=KEYS&&generatorOn&&helicopter.arrived){if(extractTimer<=0){extractTimer=5;notify('탈출 신호 송신 중! 5초 동안 구역을 지켜라.');}else notify('탈출 신호 송신 중... 적을 피해 버텨!')}else notify(`탈출 조건 미완료: 열쇠 ${keysFound}/${KEYS} · 발전기 ${generatorOn?'✓':'—'} · 헬기 ${helicopter.arrived?'도착':'대기 중'}`);return}
+ if(inHouse()&&!player.med){player.med=1;player.hp=Math.min(100,player.hp+25);notify('의료 키트 발견 · 체력 회복');beep(720,.1,'sine');return}
+ if(floorLevel===1&&d(player,secret)<65&&!secret.open){if(player.fuse){secret.open=true;notify('숨겨진 보급실 개방!');beep(320,.3,'sawtooth')}else notify('잠긴 패널이다.');return}
+ if(floorLevel===1&&d(player,signal)<55&&!player.signal){notify(`신호 장치는 필요 없다. 열쇠 ${KEYS}개와 발전기를 확보하라.`);return}
+ notify('가까운 서랍, 발전기 또는 문 앞에서 조사 버튼을 눌러.');
+}
+function end(win){game=win?'won':'lost';$('overlay').style.display='flex';$('overlay').innerHTML=`<div class="dialog"><div class="tag">${win?'EXTRACTION SUCCESS':'SIGNAL LOST'}</div><h1>${win?'탈출 성공!':'작전 실패'}</h1><p>${win?`열쇠 ${KEYS}개를 모으고 발전기를 켜서 헬기로 탈출했다!`:'체력이 모두 떨어졌다. 다시 도전해 보자!'}</p><div class="list"><div class="item">발전기: <b>${generatorOn?'가동':'정지'}</b></div><div class="item">열쇠: <b>${keysFound}/${KEYS}</b></div><div class="item">남은 체력: <b>${Math.ceil(player.hp)}%</b></div><div class="item">탄창: <b>${player.ammo}/20</b></div></div><div class="modeRow"><button id="start" class="primary">다시 플레이 ↻<small>${mode==='easy'?'초보':'보통'} 모드</small></button><button id="modeBtn" class="primary alt">모드 바꾸기<small>처음 화면으로</small></button></div><a class="more-games" href="index.html">🎮 다른 게임들</a></div>`;$('start').onclick=start;$('modeBtn').onclick=()=>location.reload()}
+function start(m){if(typeof m==='string'){mode=m;KEYS=m==='easy'?3:5;DMG=m==='easy'?.5:1}
+ // Start rendering immediately; fullscreen/orientation requests must never delay gameplay.
+ reset();game='play';$('overlay').style.display='none';resize();ensureAudio();beep(520,.07,'triangle',.018);draw();
+ try{if(!document.fullscreenElement&&document.documentElement.requestFullscreen){document.documentElement.requestFullscreen().then(()=>{resize();draw()}).catch(()=>{})}}catch(e){}
+ try{if(screen.orientation&&screen.orientation.lock){screen.orientation.lock('landscape').then(()=>{resize();draw()}).catch(()=>{})}}catch(e){}
+}
+$('start').onclick=()=>start('normal');$('startEasy').onclick=()=>start('easy');$('drawerClose').onclick=()=>{$('drawerOverlay').style.display='none'};$('fire').addEventListener('pointerdown',e=>{e.preventDefault();try{$('fire').setPointerCapture(e.pointerId)}catch(_){}fireHeld=true;fire()});for(let ev of ['pointerup','pointercancel','lostpointercapture'])$('fire').addEventListener(ev,()=>fireHeld=false);$('reload').addEventListener('pointerdown',e=>{e.preventDefault();reload()});$('weapon').addEventListener('pointerdown',e=>{e.preventDefault();cycleWeapon()});$('door').addEventListener('pointerdown',e=>{e.preventDefault();interact()});$('grenade').addEventListener('pointerdown',e=>{e.preventDefault();throwGrenade()});
+function setupStick(zoneId,knobId,callback){let zone=$(zoneId),knob=$(knobId),pid=null;function apply(e){let r=zone.getBoundingClientRect(),dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2),max=r.width*.32,l=Math.hypot(dx,dy);if(l>max){dx=dx/l*max;dy=dy/l*max}knob.style.transform=`translate(${dx}px,${dy}px)`;callback(dx/max,dy/max)}zone.addEventListener('pointerdown',e=>{e.preventDefault();pid=e.pointerId;zone.setPointerCapture(pid);apply(e)});zone.addEventListener('pointermove',e=>{if(pid===e.pointerId)apply(e)});function end(e){if(pid===e.pointerId){pid=null;knob.style.transform='translate(0,0)';callback(0,0)}}zone.addEventListener('pointerup',end);zone.addEventListener('pointercancel',end)}
+setupStick('stick','knob',(x,y)=>move={x,y});
+setupStick('aim','aimKnob',(x,y)=>{const len=Math.hypot(x,y);if(len>.12){const n=Math.min(1,(len-.12)/.88);aim={x:x/len*n,y:y/len*n};player.angle=Math.atan2(y,x)}});
+addEventListener('keydown',e=>{if(e.key==='r')reload();if(e.key==='e')interact();if(e.key==='ArrowUp'||e.key==='w')move.y=-1;if(e.key==='ArrowDown'||e.key==='s')move.y=1;if(e.key==='ArrowLeft'||e.key==='a')move.x=-1;if(e.key==='ArrowRight'||e.key==='d')move.x=1;if(e.key===' ') {e.preventDefault();fireHeld=true;fire()}});addEventListener('keyup',e=>{if(e.key===' ')fireHeld=false;if(['ArrowUp','ArrowDown','w','s'].includes(e.key))move.y=0;if(['ArrowLeft','ArrowRight','a','d'].includes(e.key))move.x=0});
+function update(dt){if(game!=='play'||$('quizOverlay').style.display==='flex')return;clock+=dt;
+ const oldAlarm=alarmTimer;alarmTimer=Math.max(0,alarmTimer-dt);if(oldAlarm>0&&alarmTimer<=0)stopSiren();ambienceClock+=dt;if(soundOn&&ambienceClock>5.5){ambienceClock=0;if(Math.random()<.48)beep(rand(42,75),rand(.25,.55),'sine',.012)}player.inv=Math.max(0,player.inv-dt);toastTime=Math.max(0,toastTime-dt);stairCooldown=Math.max(0,stairCooldown-dt);
+ let m=Math.hypot(move.x,move.y),mx=move.x,my=move.y;if(m>1){mx/=m;my/=m}
+ // Full joystick tilt gives a short sprint; small movements remain precise for looting and door interactions.
+ const moveSpeed=player.speed*(m>.88?1.12:1);moveObj(player,mx*moveSpeed*dt,my*moveSpeed*dt);
+ // Aim sticks direction; when neutral preserve previous angle. Player sight follows aim direction.
+ player.angle=Math.atan2(aim.y,aim.x);
+ // One-use floor traps disappear after contact; no jumpscare.
+ if(floorLevel===1){const trap=ambientTraps.find(t=>!t.used&&d(player,t)<19);if(trap){trap.used=true;player.hp=Math.max(1,player.hp-5);player.inv=Math.max(player.inv,.45);noise=1.2;beep(95,.18,'triangle',.035);notify('바닥 함정 발동 · 함정이 사라졌다 · 체력 -5');}}
+ // Reloading refills the magazine; reserve ammo pickups are intentionally disabled.
+ if(player.reloading>0){player.reloading=Math.max(0,player.reloading-dt);if(player.reloading===0){player.ammo=player.magSize;notify(`재장전 완료 · ${player.magSize}발`)} }
+ for(let e of foes){if(e.marked>0)e.marked=Math.max(0,e.marked-dt);if(e.stun>0)e.stun=Math.max(0,e.stun-dt);if(e.floor!==floorLevel)continue;if(e.stun>0)continue;e.cd-=dt;let dd=d(e,player),a=Math.atan2(player.y-e.y,player.x-e.x);if(noise>0&&dd<1050)e.alert=true;if(dd<900||e.alert){if(dd>(e.type==='sniper'?330:e.type==='warden'?245:(e.type==='stalker'||e.type==='runner')?24:e.type==='spitter'?280:120))moveObj(e,Math.cos(a)*e.sp*dt,Math.sin(a)*e.sp*dt);if((e.type==='stalker'||e.type==='runner')&&dd<30&&e.cd<=0){if(player.inv<=0){const hit=e.type==='runner'?8:17;player.hp-=hit*DMG;player.inv=.45;notify(e.type==='runner'?'돌진 감염체에게 부딪혔다!':'그림자 추적자에게 붙잡혔다!');if(e.type==='stalker')horrorSting()}e.cd=e.type==='runner'?.62:.9;}if(dd<780&&e.cd<=0){
+   if(e.type==='runner'){e.cd=.35;}
+   else if(e.type==='spitter'){beep(230,.08,'triangle',.025);let aa=a+(Math.random()-.5)*.08;ebullets.push({x:e.x,y:e.y,vx:Math.cos(aa)*205,vy:Math.sin(aa)*205,life:3.2,type:'spit',damage:9});e.cd=rand(1.9,2.5)}
+   else if(e.type==='warden'){gunshotAt(e.x,e.y,'heavy',1.1);let aa=a+(Math.random()-.5)*.035;ebullets.push({x:e.x,y:e.y,vx:Math.cos(aa)*340,vy:Math.sin(aa)*340,life:2.7,type:'warden',damage:24});e.cd=rand(2.1,2.7)}
+   else if(e.type==='stalker'){e.cd=.42}
+   else if(e.type==='shotgun'){gunshotAt(e.x,e.y,'shotgun',.9);for(let k=-2;k<=2;k++){let aa=a+k*.16+(Math.random()-.5)*.06;ebullets.push({x:e.x,y:e.y,vx:Math.cos(aa)*285,vy:Math.sin(aa)*285,life:1.9,type:'pellet',damage:9})}e.cd=rand(1.7,2.2)}
+   else if(e.type==='sniper'){gunshotAt(e.x,e.y,'sniper',1.0);let aa=a+(Math.random()-.5)*.035;ebullets.push({x:e.x,y:e.y,vx:Math.cos(aa)*440,vy:Math.sin(aa)*440,life:2.5,type:'sniper',damage:17});e.cd=rand(2.0,2.7)}
+   else if(e.type==='heavy'){gunshotAt(e.x,e.y,'heavy',.95);let aa=a+(Math.random()-.5)*.12;ebullets.push({x:e.x,y:e.y,vx:Math.cos(aa)*200,vy:Math.sin(aa)*200,life:3,type:'heavy',damage:11});e.cd=rand(1.25,1.65)}
+   else if(e.type==='missile'){beep(560,.11,'sawtooth',.035);let aa=a+(Math.random()-.5)*.1;ebullets.push({x:e.x,y:e.y,vx:Math.cos(aa)*150,vy:Math.sin(aa)*150,life:4,type:'homing',damage:14,turn:2.2});e.cd=rand(2.7,3.5)}
+   else {gunshotAt(e.x,e.y,e.type==='scout'?'rifle':'rifle',.72);let count=e.type==='scout'?2:1;for(let k=0;k<count;k++){let aa=a+(Math.random()-.5)*(e.type==='scout'?.32:.18);ebullets.push({x:e.x,y:e.y,vx:Math.cos(aa)*260,vy:Math.sin(aa)*260,life:2.6,type:'rifle',damage:e.type==='scout'?4:6})}e.cd=e.type==='scout'?rand(.85,1.15):rand(1.2,1.65)}
+ }} }
+ // Spatial footsteps: the player's steps are close and centered; moving enemies can be heard from their direction.
+ const movingPlayer=Math.hypot(mx,my)>.18;
+ if(movingPlayer){stepClock-=dt;if(stepClock<=0){footstepAt(player.x,player.y,.48);stepClock=.31}}else stepClock=Math.min(stepClock,.05);
+ enemyStepClock-=dt;if(enemyStepClock<=0){let heard=foes.filter(e=>e.alert&&d(e,player)<780&&e.sp>0);for(let e of heard){if(Math.random()<.72)footstepAt(e.x,e.y,.27)}enemyStepClock=.38}
+ // Reinforcements arrive over time, making the search and extraction phase longer.
+ waveTimer-=dt;if(waveTimer<=0&&foes.length<(mode==='easy'?6:18)){let sx,sy;if(floorLevel===1){let side=Math.floor(Math.random()*4);sx=side===0?Math.max(35,player.x-520):side===1?Math.min(map.w-35,player.x+520):rand(Math.max(80,player.x-520),Math.min(map.w-80,player.x+520));sy=side===2?Math.max(35,player.y-420):side===3?Math.min(map.h-35,player.y+420):rand(Math.max(80,player.y-420),Math.min(map.h-80,player.y+420));}else{sx=rand(1810,2090);sy=rand(215,395);}let type=rollEnemyType(),st=enemyStats(type);foes.push({x:sx,y:sy,floor:floorLevel,type,hp:st.hp,r:st.r,sp:st.sp,cd:rand(.5,1.4),alert:true});waveTimer=mode==='easy'?rand(16,24):rand(8,14);notify(type==='stalker'?'경고: 그림자 추적자 감지!':type==='warden'?'경고: 중무장 감시자 감지!':'무전: 적이 주변에서 새로 나타났다!')}
+ // Helicopter flies to the exact center extraction pad after the generator is powered.
+ if(generatorOn&&!helicopter.arrived){helicopter.x=1200;helicopter.y=Math.min(exits.y,helicopter.y+210*dt);if(helicopter.y>=exits.y){helicopter.y=exits.y;helicopter.arrived=true;notify('헬기 도착! 중앙 착륙 지점에서 탈출하라.');beep(740,.18,'sawtooth');setTimeout(()=>beep(560,.25,'sawtooth',.05),180)}}
+ for(let i=bullets.length-1;i>=0;i--){let b=bullets[i];b.px=b.x;b.py=b.y;b.x+=b.vx*dt;b.y+=b.vy*dt;b.life-=dt;if(b.life<=0||walls.some(w=>rectHit(b.x,b.y,3,w))){bullets.splice(i,1);continue}let e=foes.find(e=>e.floor===floorLevel&&d(e,b)<e.r+5);if(e){e.hp-=b.damage||28;bullets.splice(i,1);for(let j=0;j<5;j++)particles.push({x:e.x,y:e.y,vx:rand(-70,70),vy:rand(-70,70),life:.25,color:'#ffb08c'});if(e.hp<=0)foes.splice(foes.indexOf(e),1)}}
+ for(let i=ebullets.length-1;i>=0;i--){let b=ebullets[i];if(b.type==='homing'&&b.life>0){let a=Math.atan2(player.y-b.y,player.x-b.x),speed=Math.hypot(b.vx,b.vy),cur=Math.atan2(b.vy,b.vx),diff=Math.atan2(Math.sin(a-cur),Math.cos(a-cur));cur+=Math.max(-b.turn*dt,Math.min(b.turn*dt,diff));b.vx=Math.cos(cur)*speed;b.vy=Math.sin(cur)*speed}b.x+=b.vx*dt;b.y+=b.vy*dt;b.life-=dt;if(b.life<=0||walls.some(w=>rectHit(b.x,b.y,b.type==='homing'?7:b.type==='warden'?5:3,w))){ebullets.splice(i,1);continue}if(d(player,b)<player.r+(b.type==='homing'?9:b.type==='warden'?6:5)){ebullets.splice(i,1);if(player.inv<=0){player.hp-=(player.armor>0?Math.max(1,(b.damage||5)*.45):(b.damage||5))*DMG;if(player.armor>0)player.armor--;player.inv=.28;beep(80,.05,'triangle',.02);if(b.type==='homing')notify('유도탄에 맞았다! 엄폐물을 활용해.')}}}
+ for(let i=grenadeObjects.length-1;i>=0;i--){const g=grenadeObjects[i];if(g.floor!==floorLevel)continue;g.x+=g.vx*dt;g.y+=g.vy*dt;g.vx*=Math.pow(.12,dt);g.vy*=Math.pow(.12,dt);g.fuse-=dt;if(g.fuse<=0){for(const e of foes){if(e.floor===g.floor&&d(e,g)<150)e.hp-=105}foes=foes.filter(e=>e.hp>0);for(let j=0;j<24;j++){const a=Math.random()*Math.PI*2,sp=rand(40,240);particles.push({x:g.x,y:g.y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:rand(.2,.65),color:j%2?'#ffb84d':'#e9e2a3'})}beep(95,.3,'sawtooth',.08);notify('수류탄 폭발! 주변 적에게 피해를 줬다.');grenadeObjects.splice(i,1)}}
+ for(let i=particles.length-1;i>=0;i--){let p=particles[i];p.x+=p.vx*dt;p.y+=p.vy*dt;p.life-=dt;if(p.life<=0)particles.splice(i,1)}
+ for(const drop of weaponDrops){if(drop.floor===floorLevel&&!drop.got&&d(player,drop)<52){drop.got=true;if(!weaponsOwned.includes(drop.type))weaponsOwned.push(drop.type);equipWeapon(drop.type);pickupSound('weapon');}}
+ for(let l of loot)if(!l.got&&d(player,l)<30){if(l.type==='fuse'){l.got=true;player.fuse=true;notify('퓨즈 획득! 집의 단서를 기억해 두자.');beep(650,.1,'sine')}else if(l.type==='med'){l.got=true;player.med=1;player.hp=Math.min(100,player.hp+30);notify('의료 키트 사용 · 체력 회복');beep(700,.1,'sine')}else if(l.type==='ammo'){l.got=true;player.hp=Math.min(100,player.hp+12);notify('의료품 +12');beep(500,.1,'sine')}else if(l.type==='secret'){if(player.fuse){l.got=true;secret.open=true;notify('숨겨진 지하 보급실이 열렸다!');beep(300,.25,'sawtooth')}else if(!seen.has('secret')){seen.add('secret');notify('패널이 잠겨 있다. 다른 곳에서 퓨즈를 찾아라.')}}else if(l.type==='signal'&&secret.open){l.got=true;player.signal=true;notify('신호 장치 확보! 탈출 지점으로!');beep(850,.2,'sine')}}
+ if(extractTimer>0){if(floorLevel!==1||d(player,exits)>exits.r+30){extractTimer=0;notify('탈출 구역을 벗어남 · 송신 취소')}else{extractTimer=Math.max(0,extractTimer-dt);if(extractTimer===0&&keysFound>=KEYS&&generatorOn&&helicopter.arrived){end(true);return}}}if(d(player,exits)<exits.r+10&&keysFound<KEYS&&!seen.has('exit')){seen.add('exit');notify(`탈출 조건: 발전기 ${generatorOn?'✓':'—'} · 열쇠 ${keysFound}/${KEYS}`)}
+ noise=Math.max(0,noise-dt*.2);
+ if(fireHeld&&clock-lastShot>weaponInfo().delay)fire();
+ $('hp').textContent=Math.ceil(player.hp)+'%';$('hpbar').style.width=player.hp+'%';$('ammo').textContent=player.reloading>0?`재장전 ${player.reloading.toFixed(1)}초`:`${weaponInfo().name} · ${player.ammo}/${player.magSize}`;
+ $('status').textContent=extractTimer>0?`탈출 신호 ${extractTimer.toFixed(1)}초 · 적 ${foes.length}`:`${floorLevel+'층'} · 발전기 ${generatorOn?'ON':'OFF'} · 열쇠 ${keysFound}/${KEYS} · 수류탄 ${player.grenades||0} · 적 ${foes.filter(e=>e.floor===floorLevel).length}`;
+ let nearStair=mode!=='easy'&&stairs.some(q=>q.floor===floorLevel&&d(player,q)<36),nearDrawer=drawers.some(q=>q.floor===floorLevel&&!q.found&&d(player,q)<50),nearGen=floorLevel===1&&d(player,{x:1570,y:1200})<78,nearGenDoor=floorLevel===1&&d(player,{x:1550,y:1390})<75,nearExit=floorLevel===1&&d(player,exits)<85&&helicopter.arrived,nearTerminal=false,nearRadio=false,nearDevice=worldDevices.find(q=>q.floor===floorLevel&&!q.used&&d(player,q)<34);$('door').style.display=(nearStair||nearDrawer||nearGen||nearGenDoor||nearExit||nearTerminal||nearRadio||nearDevice||inHouse())?'block':'none';$('door').textContent=nearDevice?({alarm:'경보 함정 작동',cache:'응급 보급함 열기',emp:'EMP 방출'}[nearDevice.type]):nearTerminal?'의료 스테이션':nearRadio?'방어 장비함 열기':nearExit?(extractTimer>0?'헬기 탑승 대기 중':'헬기로 탈출'):nearGen?(generatorDoorOpen?'발전기 켜기':'발전기실 잠김'):nearGenDoor?(generatorDoorOpen?'문 열림':`문 열기 · 열쇠 ${keysFound}/${KEYS}`):nearDrawer?'수납장 수색':nearStair?(stairs.find(q=>q.floor===floorLevel&&d(player,q)<36)?.label||'층 이동'):'수색';
+ $('grenade').textContent='수류탄 ×'+(player.grenades||0);if(player.hp<=0){player.hp=0;end(false)}
+}
+function draw(){
+ // 새 렌더러: 월드 좌표는 한 번만 카메라 변환하고, HUD는 변환을 끝낸 뒤 그린다.
+ ctx.setTransform(dpr,0,0,dpr,0,0);
+ ctx.globalAlpha=1;ctx.shadowBlur=0;ctx.setLineDash([]);
+ ctx.clearRect(0,0,W,H);ctx.fillStyle='#182322';ctx.fillRect(0,0,W,H);
+ const cam=camera();
+ ctx.save();ctx.translate(-cam.x,-cam.y);
+ // NEW MAP: abandoned research outpost wrapped around a central helicopter courtyard
+ const grass=(x,y,w,h,col)=>{ctx.fillStyle=col;ctx.fillRect(x,y,w,h)};
+ grass(0,0,map.w,map.h,'#1c3025');
+ // mottled ground, cracked concrete and patches of weeds
+ for(let i=0;i<210;i++){const x=(i*293+113)%map.w,y=(i*197+79)%map.h;ctx.fillStyle=i%6===0?'#394434':i%3===0?'#263b2d':'#203428';ctx.beginPath();ctx.ellipse(x,y,15+(i%7)*7,8+(i%5)*4,(i%13)*.17,0,Math.PI*2);ctx.fill()}
+ // A broad central square and four connecting service roads
+ grass(0,760,map.w,150,'#353c38');grass(1080,0,150,map.h,'#353c38');
+ grass(0,480,780,58,'#303936');grass(1540,480,860,58,'#303936');
+ grass(0,1050,710,58,'#303936');grass(1750,1050,650,58,'#303936');
+ grass(610,480,58,300,'#303936');grass(610,900,58,208,'#303936');
+ grass(1710,480,58,300,'#303936');grass(1710,900,58,208,'#303936');
+ grass(610,1050,58,380,'#303936');grass(1710,1050,58,380,'#303936');
+ // lane markings and road wear
+ ctx.strokeStyle='#9a9a7c';ctx.lineWidth=3;ctx.setLineDash([24,20]);ctx.beginPath();ctx.moveTo(0,805);ctx.lineTo(map.w,805);ctx.moveTo(0,865);ctx.lineTo(map.w,865);ctx.moveTo(1140,0);ctx.lineTo(1140,map.h);ctx.moveTo(1200,0);ctx.lineTo(1200,map.h);ctx.stroke();ctx.setLineDash([]);
+ ctx.strokeStyle='#697167';ctx.lineWidth=5;ctx.strokeRect(8,8,map.w-16,map.h-16);
+ // abandoned outpost buildings; each has a distinct footprint and color
+ const building=(x,y,w,h,label,col)=>{ctx.fillStyle='#0c1511';ctx.fillRect(x+9,y+10,w,h);ctx.fillStyle=col;ctx.fillRect(x,y,w,h);ctx.strokeStyle='#c0cbb2';ctx.lineWidth=4;ctx.strokeRect(x+2,y+2,w-4,h-4);ctx.fillStyle='#2e3b31';ctx.fillRect(x+15,y+15,w-30,h-30);ctx.fillStyle='#dce4d1';ctx.font='bold 17px system-ui';ctx.textAlign='center';ctx.fillText(label,x+w/2,y-13)};
+ const tile=(x,y,w,h)=>{ctx.fillStyle='#5b594a';ctx.fillRect(x,y,w,h);ctx.strokeStyle='#746f5a';ctx.lineWidth=1;for(let xx=x+18;xx<x+w;xx+=34){ctx.beginPath();ctx.moveTo(xx,y+3);ctx.lineTo(xx,y+h-3);ctx.stroke()}for(let yy=y+18;yy<y+h;yy+=34){ctx.beginPath();ctx.moveTo(x+3,yy);ctx.lineTo(x+w-3,yy);ctx.stroke()}};
+ const crate=(x,y,w=32,h=28)=>{ctx.fillStyle='#594832';ctx.fillRect(x,y,w,h);ctx.strokeStyle='#b49b6e';ctx.lineWidth=2;ctx.strokeRect(x+1,y+1,w-2,h-2);ctx.beginPath();ctx.moveTo(x+3,y+3);ctx.lineTo(x+w-3,y+h-3);ctx.moveTo(x+w-3,y+3);ctx.lineTo(x+3,y+h-3);ctx.stroke()};
+ const bed=(x,y)=>{ctx.fillStyle='#3d4036';ctx.fillRect(x,y,70,36);ctx.fillStyle='#d2d2bb';ctx.fillRect(x+4,y+4,62,28);ctx.fillStyle='#7e9580';ctx.fillRect(x+29,y+5,33,26);ctx.fillStyle='#e7e0c9';ctx.fillRect(x+7,y+6,19,11);ctx.strokeStyle='#d6d8c2';ctx.strokeRect(x,y,70,36)};
+ const desk=(x,y,w=62)=>{ctx.fillStyle='#745439';ctx.fillRect(x,y,w,26);ctx.fillStyle='#b6c8b0';ctx.fillRect(x+7,y+5,17,11);ctx.fillStyle='#202b28';ctx.fillRect(x+31,y+5,22,15);ctx.strokeStyle='#d3b988';ctx.strokeRect(x,y,w,26)};
+ const shelf=(x,y,w=70)=>{ctx.fillStyle='#4b4030';ctx.fillRect(x,y,w,18);ctx.fillStyle='#a78b5e';ctx.fillRect(x+3,y+3,w-6,4);ctx.fillRect(x+3,y+11,w-6,4);ctx.strokeStyle='#d0b27c';ctx.strokeRect(x,y,w,18)};
+ if(floorLevel===1){
+   building(150,170,370,250,'안전가옥','#626e59');tile(172,192,326,184);bed(215,235);desk(315,285,52);crate(415,320,34,28);
+   building(760,140,390,250,'물류창고','#6b6550');tile(782,162,346,180);shelf(805,195,88);shelf(805,228,88);shelf(990,195,92);shelf(990,228,92);crate(900,280);crate(940,280);
+   building(1770,170,360,280,'아파트 단지','#596b61');tile(1792,192,316,210);ctx.fillStyle='#52685b';ctx.fillRect(1820,225,95,32);ctx.fillStyle='#879783';ctx.fillRect(1826,231,83,20);ctx.fillStyle='#705a43';ctx.fillRect(1940,280,65,38);ctx.strokeStyle='#d1b58b';ctx.strokeRect(1940,280,65,38);bed(2025,220);desk(2020,340,60);
+   building(170,690,390,260,'차량 정비소','#68604f');tile(192,712,346,210);ctx.fillStyle='#444d45';ctx.fillRect(255,755,130,58);ctx.fillStyle='#8b9a88';ctx.fillRect(270,762,35,18);ctx.fillRect(312,762,35,18);ctx.fillStyle='#171d1a';ctx.beginPath();ctx.arc(280,815,11,0,Math.PI*2);ctx.arc(360,815,11,0,Math.PI*2);ctx.fill();shelf(420,740,76);crate(425,825,35,30);
+   building(730,1220,370,250,'의무실','#626e59');tile(752,1242,326,184);for(const [x,y] of [[785,1275],[785,1350],[920,1275]]){ctx.fillStyle='#d9d9c9';ctx.fillRect(x,y,76,32);ctx.fillStyle='#8ea99b';ctx.fillRect(x+5,y+5,66,22);ctx.fillStyle='#b94f4f';ctx.fillRect(x+33,y+10,10,10)}desk(955,1370,75);
+   building(1770,680,380,260,'통신·경비동','#52665e');tile(1792,702,336,215);desk(1820,735,85);desk(1930,735,85);ctx.fillStyle='#73d5c0';ctx.fillRect(1830,741,17,9);ctx.fillRect(1855,741,17,9);ctx.fillRect(1940,741,17,9);ctx.fillRect(1965,741,17,9);shelf(2030,820,68);
+   // Randomized enterable buildings: new positions, doors, furniture and interiors every run.
+   randomBuildings.forEach((b,i)=>{ctx.fillStyle='#111914';ctx.fillRect(b.x+4,b.y+5,b.w,b.h);ctx.fillStyle=['#4c5548','#5b5143','#48534f','#61584c'][b.variant];ctx.fillRect(b.x,b.y,b.w,b.h);ctx.fillStyle='#252e28';ctx.fillRect(b.x+11,b.y+11,b.w-22,b.h-22);
+     ctx.strokeStyle='#a0ab94';ctx.lineWidth=10;ctx.lineCap='butt';ctx.beginPath();const gap=36,mid=b.doorSide===0?b.x+b.w*.4+gap/2:b.doorSide===1?b.x+b.w*.4+gap/2:b.doorSide===2?b.y+b.h*.4+gap/2:b.y+b.h*.4+gap/2;
+     ctx.moveTo(b.x,b.y);ctx.lineTo(b.x+b.w,b.y);ctx.moveTo(b.x,b.y+b.h);ctx.lineTo(b.x+b.w,b.y+b.h);ctx.moveTo(b.x,b.y);ctx.lineTo(b.x,b.y+b.h);ctx.moveTo(b.x+b.w,b.y);ctx.lineTo(b.x+b.w,b.y+b.h);ctx.stroke();ctx.strokeStyle='#1c3025';ctx.lineWidth=13;ctx.beginPath();if(b.doorSide===0){ctx.moveTo(mid-gap/2,b.y);ctx.lineTo(mid+gap/2,b.y)}else if(b.doorSide===1){ctx.moveTo(mid-gap/2,b.y+b.h);ctx.lineTo(mid+gap/2,b.y+b.h)}else if(b.doorSide===2){ctx.moveTo(b.x,mid-gap/2);ctx.lineTo(b.x,mid+gap/2)}else{ctx.moveTo(b.x+b.w,mid-gap/2);ctx.lineTo(b.x+b.w,mid+gap/2)}ctx.stroke();
+     b.furniture.forEach((f,fi)=>{ctx.fillStyle=fi%2?'#554635':'#6f6149';ctx.fillRect(f.x,f.y,f.w,f.h);ctx.strokeStyle='#b9a47c';ctx.lineWidth=2;ctx.strokeRect(f.x,f.y,f.w,f.h);ctx.fillStyle='#292f28';ctx.fillRect(f.x+4,f.y+4,Math.max(2,f.w-8),4)});
+     ctx.fillStyle='#d2d8c3';ctx.font='bold 10px system-ui';ctx.textAlign='center';ctx.fillText('폐허 건물 '+(i+1),b.x+b.w/2,b.y-8)});
+   // generator compound remains at the same gameplay coordinates
+   ctx.fillStyle='#0e1713';ctx.fillRect(1378,1100,380,300);ctx.fillStyle='#37463b';ctx.fillRect(1370,1090,380,310);ctx.strokeStyle='#b5c1a8';ctx.lineWidth=4;ctx.strokeRect(1373,1093,374,304);ctx.fillStyle='#4b5748';ctx.fillRect(1402,1122,316,246);ctx.strokeStyle='#6f806d';ctx.lineWidth=2;ctx.strokeRect(1410,1130,300,230);
+   for(const [bx,by] of [[1430,1205],[1660,1245]]){ctx.fillStyle='#6d7a63';ctx.fillRect(bx,by,26,38);ctx.fillStyle='#c5c5a0';ctx.fillRect(bx,by+5,26,4);ctx.fillRect(bx,by+28,26,4);ctx.strokeStyle='#aab99c';ctx.strokeRect(bx,by,26,38)}desk(1420,1305,80);ctx.strokeStyle=generatorOn?'#68e9a3':'#9e624b';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(1500,1220);ctx.lineTo(1520,1240);ctx.lineTo(1605,1240);ctx.lineTo(1625,1270);ctx.stroke();ctx.fillStyle=generatorOn?'#8dffb2':'#df7e68';ctx.beginPath();ctx.arc(1605,1150,6,0,Math.PI*2);ctx.fill();ctx.fillStyle=generatorOn?'#70e69a':'#58655b';ctx.fillRect(1530,1170,80,62);ctx.fillStyle='#f0f5e8';ctx.font='bold 13px system-ui';ctx.textAlign='center';ctx.fillText(generatorOn?'발전기 ON':'발전기 OFF',1570,1160);
+   // central extraction square, painted like a marked landing pad
+   ctx.fillStyle='#424b44';ctx.fillRect(1010,700,380,300);ctx.strokeStyle='#b8c8ad';ctx.lineWidth=4;ctx.strokeRect(1018,708,364,284);ctx.strokeStyle='#9ca88d';ctx.lineWidth=2;ctx.beginPath();ctx.arc(1200,850,94,0,Math.PI*2);ctx.stroke();ctx.beginPath();ctx.moveTo(1140,850);ctx.lineTo(1260,850);ctx.moveTo(1200,790);ctx.lineTo(1200,910);ctx.stroke();
+   // low concrete barriers and wrecked vehicles create alternate routes
+   for(const [x,y,w,h] of [[590,590,82,26],[840,570,95,24],[1450,585,100,26],[1650,620,80,25],[590,970,95,25],[880,980,95,25],[1450,1010,95,25],[1800,990,100,25]]){ctx.fillStyle='#59645a';ctx.fillRect(x,y,w,h);ctx.strokeStyle='#9aa58f';ctx.strokeRect(x,y,w,h)}
+   for(const [x,y] of [[90,620],[670,420],[1320,610],[1670,450],[690,1160],[1270,1460],[1830,1160],[2220,960],[2250,350],[650,1500]]){ctx.fillStyle='#d4cfa1';ctx.beginPath();ctx.arc(x,y,5,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#a2a78b';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x,y+20);ctx.stroke()}
+   // roadside interactables: alarm trap, emergency cache, EMP node
+   worldDevices.filter(q=>q.floor===1&&['alarm','cache','emp'].includes(q.type)).forEach(q=>{ctx.save();ctx.translate(q.x,q.y);if(q.type==='alarm'){ctx.fillStyle=q.used?'#353d38':'#652f32';ctx.fillRect(-17,-13,34,26);ctx.strokeStyle=q.used?'#778078':'#ff6868';ctx.lineWidth=3;ctx.strokeRect(-17,-13,34,26);ctx.fillStyle=q.used?'#64716a':(Math.sin(clock*9)>0?'#ff5757':'#f8d7a0');ctx.beginPath();ctx.arc(0,-8,5,0,Math.PI*2);ctx.fill();ctx.fillStyle='#f5e6d2';ctx.font='bold 10px system-ui';ctx.textAlign='center';ctx.fillText(q.used?'함정 작동':'경보 함정',0,25)}else if(q.type==='cache'){ctx.fillStyle=q.used?'#38443b':'#3c654d';ctx.fillRect(-18,-13,36,26);ctx.strokeStyle=q.used?'#718072':'#8cf0ad';ctx.lineWidth=3;ctx.strokeRect(-18,-13,36,26);ctx.fillStyle='#d6f6c8';ctx.fillRect(-3,-9,6,18);ctx.fillRect(-9,-3,18,6);ctx.fillStyle='#e7f5e3';ctx.font='bold 10px system-ui';ctx.textAlign='center';ctx.fillText(q.used?'보급 완료':'응급 보급함',0,25)}else{ctx.fillStyle=q.used?'#343a46':'#293f68';ctx.fillRect(-17,-14,34,28);ctx.strokeStyle=q.used?'#747b89':'#7ac8ff';ctx.lineWidth=3;ctx.strokeRect(-17,-14,34,28);ctx.fillStyle=q.used?'#7d8795':'#8be0ff';ctx.beginPath();ctx.arc(0,0,7+Math.sin(clock*5)*2,0,Math.PI*2);ctx.fill();ctx.fillStyle='#e1f5ff';ctx.font='bold 10px system-ui';ctx.textAlign='center';ctx.fillText(q.used?'EMP 사용':'EMP 방출기',0,27)}ctx.restore()});
+   // New ominous interactables: cursed radio, tripwire beacon and breaker.
+   worldDevices.filter(q=>q.floor===floorLevel&&false).forEach(q=>{ctx.save();ctx.translate(q.x,q.y);const col=q.type==='cursed'?'#bb79ff':q.type==='tripwire'?'#ff5b5b':'#e8bd6a';ctx.shadowColor=col;ctx.shadowBlur=12;ctx.fillStyle='#18201d';ctx.fillRect(-16,-13,32,26);ctx.strokeStyle=q.used?'#56615c':col;ctx.lineWidth=3;ctx.strokeRect(-16,-13,32,26);ctx.shadowBlur=0;if(q.type==='cursed'){ctx.fillStyle=col;ctx.fillRect(-10,-7,20,3);ctx.fillRect(-6,-2,12,3);ctx.beginPath();ctx.arc(0,7,4,0,Math.PI*2);ctx.fill()}else if(q.type==='tripwire'){ctx.strokeStyle=col;ctx.beginPath();ctx.moveTo(-12,-7);ctx.lineTo(12,7);ctx.moveTo(-12,7);ctx.lineTo(12,-7);ctx.stroke()}else{ctx.fillStyle=col;ctx.fillRect(-8,-7,16,14);ctx.fillStyle='#222';ctx.fillRect(-4,-4,8,8)}ctx.fillStyle='#f6e9d3';ctx.font='bold 10px system-ui';ctx.textAlign='center';ctx.fillText(q.used?'작동 완료':q.label,0,27);ctx.restore()});
+   // Uncanny floor traps are not interactable; contact triggers a short scare and 5 damage.
+   ambientTraps.forEach(t=>{if(t.used)return;ctx.save();ctx.translate(t.x,t.y);ctx.rotate(Math.sin(clock*1.7+t.x)*.08);ctx.shadowColor='#8c2639';ctx.shadowBlur=13;ctx.fillStyle='#111614';ctx.beginPath();ctx.ellipse(0,0,16,10,0,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#7d343f';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(-13,4);ctx.lineTo(-4,-8);ctx.lineTo(2,5);ctx.lineTo(9,-7);ctx.stroke();ctx.shadowBlur=0;ctx.fillStyle=Math.sin(clock*5+t.y)>.55?'#e8a3a5':'#4d202a';ctx.beginPath();ctx.arc(0,-1,3,0,Math.PI*2);ctx.fill();ctx.restore()});
+   // Abandoned wrecks and environmental silhouettes fill wide empty spaces; collision is enabled separately.
+
+   const wreck=(x,y,rot=0)=>{ctx.save();ctx.translate(x,y);ctx.rotate(rot);ctx.fillStyle='#121a17';ctx.fillRect(-35,-17,70,34);ctx.fillStyle='#48534a';ctx.fillRect(-31,-15,62,30);ctx.fillStyle='#283632';ctx.fillRect(-18,-11,27,22);ctx.fillStyle='#789087';ctx.fillRect(-13,-9,17,8);ctx.fillStyle='#171d1b';ctx.fillRect(-24,-21,14,5);ctx.fillRect(12,-21,14,5);ctx.fillRect(-24,16,14,5);ctx.fillRect(12,16,14,5);ctx.strokeStyle='#8a9b88';ctx.lineWidth=2;ctx.strokeRect(-31,-15,62,30);ctx.strokeStyle='#a45b4b';ctx.beginPath();ctx.moveTo(22,-10);ctx.lineTo(29,-3);ctx.lineTo(22,4);ctx.stroke();ctx.restore()};
+   [[300,535,.12],[980,625,-.2],[1510,620,.15],[2050,600,-.1],[430,1010,.3],[970,1120,-.1],[1280,1030,.2],[1870,1010,-.2],[550,1510,.05],[2170,1450,.2]].forEach(a=>wreck(a[0],a[1],a[2]));
+   for(const [px,py] of [[570,640],[725,590],[1370,640],[1745,635],[730,975],[1110,1000],[1375,990],[1750,980],[1210,1070]]){ctx.fillStyle='#111c19';ctx.beginPath();ctx.ellipse(px,py,27,11,.2,0,Math.PI*2);ctx.fill();ctx.fillStyle='rgba(113,143,132,.22)';ctx.beginPath();ctx.ellipse(px-4,py-2,18,6,.2,0,Math.PI*2);ctx.fill()}
+   for(let i=0;i<12;i++){const px=(i*211+95)%map.w,py=(i*137+530)%map.h;ctx.strokeStyle='#505c50';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(px+rand(-8,8),py+30);ctx.stroke();ctx.fillStyle='#c0b08a';ctx.beginPath();ctx.arc(px,py,4,0,Math.PI*2);ctx.fill();ctx.fillStyle='rgba(245,210,130,.08)';ctx.beginPath();ctx.arc(px,py,34,0,Math.PI*2);ctx.fill()}
+   // small debris, weeds and road cracks for extra texture
+   for(let i=0;i<85;i++){const x=(i*197+73)%map.w,y=(i*131+91)%map.h;if((x>1770&&x<2130&&y>170&&y<450)||(x>1370&&x<1750&&y>1090&&y<1400))continue;ctx.fillStyle=i%3?'#8c9677':'#b2a887';ctx.globalAlpha=.20;ctx.fillRect(x,y,2+(i%3),1+(i%2));}ctx.globalAlpha=1;
+ }else{
+   // Apartment upper floors use the exact same footprint as the ground-floor apartment.
+   grass(0,0,map.w,map.h,'#26332d');
+   grass(1760,160,380,300,'#4a4d43');
+   const apartmentUpper=(x,y,w,h,title)=>{ctx.fillStyle='#111a17';ctx.fillRect(x+8,y+9,w,h);ctx.fillStyle='#596b61';ctx.fillRect(x,y,w,h);ctx.strokeStyle='#c0cbb2';ctx.lineWidth=4;ctx.strokeRect(x+2,y+2,w-4,h-4);ctx.fillStyle='#38443b';ctx.fillRect(x+14,y+14,w-28,h-28);ctx.fillStyle='#e0e7d7';ctx.font='bold 17px system-ui';ctx.textAlign='center';ctx.fillText(title,x+w/2,y-12)};
+   apartmentUpper(1770,170,360,280,'아파트 2층');
+   // 상층 전용 장식: 바닥 타일, 창문, 카펫으로 공간 구분
+   ctx.fillStyle='#4a594c';for(let tx=1798;tx<2105;tx+=38){ctx.beginPath();ctx.moveTo(tx,195);ctx.lineTo(tx+18,195);ctx.lineTo(tx+18,395);ctx.lineTo(tx,395);ctx.closePath();ctx.fill()}ctx.strokeStyle='rgba(210,224,195,.13)';ctx.lineWidth=1;for(let tx=1800;tx<2105;tx+=24){ctx.beginPath();ctx.moveTo(tx,198);ctx.lineTo(tx,400);ctx.stroke()}for(let ty=205;ty<405;ty+=24){ctx.beginPath();ctx.moveTo(1798,ty);ctx.lineTo(2100,ty);ctx.stroke()}ctx.fillStyle='rgba(215,235,208,.08)';ctx.fillRect(1798,198,302,202);ctx.fillStyle='#6e8275';ctx.fillRect(1888,174,52,8);ctx.fillRect(2040,174,52,8);ctx.strokeStyle='#d3e8d5';ctx.lineWidth=2;ctx.strokeRect(1888,174,52,8);ctx.strokeRect(2040,174,52,8)
+   ctx.fillStyle='#6b9c9b';ctx.fillRect(1888,174,52,8);ctx.fillRect(2040,174,52,8);ctx.strokeStyle='#b8d8cf';ctx.lineWidth=2;ctx.strokeRect(1888,174,52,8);ctx.strokeRect(2040,174,52,8);
+   ctx.fillStyle='#7b6450';ctx.fillRect(1905,270,76,34);ctx.strokeStyle='#bda37d';ctx.strokeRect(1905,270,76,34);ctx.fillStyle='#c1aa80';ctx.fillRect(1912,277,62,20);
+   // Rooms and furniture stay within the same apartment footprint on both floors.
+   if(floorLevel===2){bed(1810,220);bed(1810,315);desk(1925,225,65);desk(1925,315,65);ctx.fillStyle='#68796b';ctx.fillRect(2005,215,78,35);ctx.strokeStyle='#c7d0b7';ctx.strokeRect(2005,215,78,35);ctx.fillStyle='#3b493f';ctx.fillRect(2009,219,70,27);shelf(2005,290,76);ctx.fillStyle='#d5c9a5';ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillText('침실 · 거실 · 주방',1950,438)}
+   else{bed(1810,215);bed(1810,310);desk(1925,215,65);desk(1925,310,65);shelf(1995,220,64);ctx.fillStyle='#657567';ctx.fillRect(1985,315,92,42);ctx.strokeStyle='#c7d0b7';ctx.strokeRect(1985,315,92,42);ctx.fillStyle='#7f9d88';ctx.fillRect(1992,322,78,28);ctx.fillStyle='#23332d';ctx.fillRect(1840,365,80,25);ctx.strokeStyle='#90b6a0';ctx.strokeRect(1840,365,80,25);ctx.fillStyle='#79efbf';ctx.fillRect(1848,371,8,5);ctx.fillRect(1862,371,8,5);ctx.fillRect(1876,371,8,5);ctx.fillStyle='#d5c9a5';ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillText('침실 · 장비실 · 통신실',1950,438)}
+ }
+ // 충돌 벽을 시각적으로 표시
+ walls.forEach(w=>{ctx.fillStyle='#788575';ctx.fillRect(w.x,w.y,w.w,w.h);ctx.strokeStyle='#a9b5a1';ctx.lineWidth=2;ctx.strokeRect(w.x,w.y,w.w,w.h);if(w.w>10&&w.h>10){ctx.fillStyle='#a5b09d';ctx.fillRect(w.x+3,w.y+3,Math.max(1,w.w-6),4)}});
+ // 아파트 2층 장비 및 가구
+
+ // 서랍
+ drawers.filter(q=>q.floor===floorLevel).forEach((q,i)=>{ctx.fillStyle=q.found?'#47554b':'#916b43';ctx.fillRect(q.x-18,q.y-12,36,24);ctx.strokeStyle=q.found?'#8eb59a':'#f0ce92';ctx.lineWidth=2;ctx.strokeRect(q.x-18,q.y-12,36,24);ctx.fillStyle=q.found?'#53655a':'#c39a65';ctx.fillRect(q.x-13,q.y-7,26,4);ctx.fillStyle='#292d25';ctx.fillRect(q.x-3,q.y+1,6,3);ctx.fillStyle='#fff0ce';ctx.font='10px system-ui';ctx.textAlign='center';ctx.fillText(q.found?'빈 서랍':'서랍 '+(i+1),q.x,q.y-19);if(!q.found){ctx.fillStyle='#ffe080';ctx.beginPath();ctx.arc(q.x,q.y,3,0,Math.PI*2);ctx.fill()}});
+ // 획득 아이템
+ loot.forEach(l=>{if(l.got)return;ctx.save();ctx.translate(l.x,l.y);ctx.rotate(Math.PI/4);ctx.fillStyle=l.type==='signal'?'#8be4e0':l.type==='secret'?'#d3a7ff':l.type==='fuse'?'#9ce8b3':'#f0d47f';ctx.fillRect(-7,-7,14,14);ctx.restore();ctx.fillStyle='#fff4d6';ctx.font='11px system-ui';ctx.textAlign='center';ctx.fillText(({fuse:'퓨즈',med:'의료',ammo:'탄약',secret:'?',signal:'신호'})[l.type]||'아이템',l.x,l.y-14)});
+ // 총기 파밍 지점: 빛을 비추면 무기 실루엣과 이름을 확인할 수 있다.
+ weaponDrops.filter(q=>q.floor===floorLevel).forEach(q=>{if(q.got)return;ctx.save();ctx.translate(q.x,q.y);ctx.rotate(-.25);ctx.fillStyle='#d8c28a';ctx.fillRect(-15,-4,30,8);ctx.fillStyle='#37433a';ctx.fillRect(-5,-7,14,5);ctx.fillRect(-9,3,7,8);ctx.strokeStyle='#f6e3aa';ctx.lineWidth=2;ctx.strokeRect(-17,-6,34,14);ctx.restore();ctx.fillStyle='#f6e3aa';ctx.font='bold 11px system-ui';ctx.textAlign='center';ctx.fillText('무기 · '+q.label,q.x,q.y-18)});
+ // Ground-floor stairwells connect to the redesigned second floor.
+ stairs.filter(q=>q.floor===floorLevel&&mode!=='easy').forEach(q=>{ctx.fillStyle='#d7d7a0';ctx.fillRect(q.x-24,q.y-32,48,64);ctx.strokeStyle='#f2efbd';ctx.lineWidth=2;ctx.strokeRect(q.x-24,q.y-32,48,64);for(let k=0;k<5;k++){ctx.beginPath();ctx.moveTo(q.x-18,q.y-22+k*11);ctx.lineTo(q.x+18,q.y-22+k*11);ctx.stroke()}ctx.fillStyle='#fff3bc';ctx.font='bold 12px system-ui';ctx.textAlign='center';ctx.fillText(q.toFloor+'층 계단',q.x,q.y+48)});
+ // 탈출 지점
+ if(floorLevel===1){ctx.beginPath();ctx.arc(exits.x,exits.y,exits.r,0,Math.PI*2);ctx.fillStyle='#9fdda822';ctx.fill();ctx.strokeStyle='#b9e6a5';ctx.lineWidth=4;ctx.stroke();ctx.fillStyle='#e6f7d7';ctx.font='bold 14px system-ui';ctx.textAlign='center';ctx.fillText(helicopter.arrived?'헬기 도착 · 탈출 지점':generatorOn?'헬기 접근 중':'발전기 가동 후 헬기 호출',exits.x,exits.y+5);
+  if(generatorOn){ctx.save();ctx.translate(helicopter.x,helicopter.y);ctx.fillStyle='#aab7a6';ctx.strokeStyle='#e4eddb';ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(0,0,43,20,0,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.fillStyle='#5b7169';ctx.fillRect(-18,-11,22,12);ctx.fillStyle='#cbd7c5';ctx.fillRect(22,-4,28,8);ctx.beginPath();ctx.moveTo(-8,-18);ctx.lineTo(-8,18);ctx.moveTo(-53,-25);ctx.lineTo(37,-25);ctx.moveTo(-53,25);ctx.lineTo(37,25);ctx.stroke();ctx.restore();}}
+ // 총알
+ bullets.forEach(b=>{ctx.save();ctx.lineCap='round';ctx.strokeStyle='#ffbd62';ctx.shadowColor='#ffb74e';ctx.shadowBlur=10;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(b.px,b.py);ctx.lineTo(b.x,b.y);ctx.stroke();ctx.restore()});
+ ebullets.forEach(b=>{const col=({rifle:'#ff776c',pellet:'#ffd27a',sniper:'#9ad7ff',heavy:'#d2a0ff',homing:'#ff9b45',warden:'#ff4d8a'})[b.type]||'#ff776c';ctx.strokeStyle=col;ctx.lineWidth=b.type==='homing'?5:3;ctx.shadowColor=col;ctx.shadowBlur=5;ctx.beginPath();ctx.moveTo(b.x-b.vx*.045,b.y-b.vy*.045);ctx.lineTo(b.x,b.y);ctx.stroke();ctx.fillStyle=col;ctx.beginPath();ctx.arc(b.x,b.y,b.type==='homing'?7:b.type==='heavy'?5:3,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0});
+ // 적 캐릭터와 체력바
+ foes.filter(e=>e.floor===floorLevel).forEach(e=>{ctx.save();ctx.translate(e.x,e.y);ctx.rotate(Math.atan2(player.y-e.y,player.x-e.x));ctx.fillStyle=e.stun>0?'#7ac8ff':({scout:'#f2d56d',rifle:'#d98c72',shotgun:'#d86b68',sniper:'#83b7df',heavy:'#b38ce0',missile:'#ff8b4b',stalker:'#b7ffca',warden:'#ff3f7b',runner:'#f5a642',spitter:'#a5d66d'})[e.type]||'#d98c72';ctx.beginPath();if(e.type==='heavy'||e.type==='warden'){ctx.rect(-14,-13,28,26);if(e.type==='warden'){ctx.strokeStyle='#ff9ab7';ctx.lineWidth=3;ctx.strokeRect(-18,-17,36,34)}}else{ctx.moveTo((e.type==='missile'||e.type==='warden'||e.type==='runner')?20:16,0);ctx.lineTo(-10,-(e.type==='shotgun'?13:e.type==='runner'?7:10));ctx.lineTo(-6,0);ctx.lineTo(-10,e.type==='shotgun'?13:e.type==='runner'?7:10);ctx.closePath()}ctx.fill();ctx.fillStyle='#f7e9d0';ctx.fillRect(2,-3,12,6);ctx.restore();ctx.fillStyle='#352c28';ctx.fillRect(e.x-15,e.y-22,30,4);ctx.fillStyle='#e88973';ctx.fillRect(e.x-15,e.y-22,30*Math.max(0,e.hp/(e.type==='warden'?190:e.type==='stalker'?138:e.type==='runner'?42:e.type==='spitter'?68:e.type==='heavy'?112:e.type==='shotgun'?78:e.type==='sniper'?78:e.type==='missile'?85:52)),4)});
+ particles.forEach(p=>{ctx.globalAlpha=Math.max(0,p.life/.25);ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(p.x,p.y,3,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1});
+ // 손전등 시야: 맵 전체를 어둡게 덮고, 플레이어 앞의 좁은 원뿔만 밝힌다.
+ darkCtx.save();darkCtx.setTransform(1,0,0,1,0,0);darkCtx.globalCompositeOperation='source-over';darkCtx.globalAlpha=1;darkCtx.clearRect(0,0,map.w,map.h);darkCtx.fillStyle=generatorOn?'rgba(2,8,7,.79)':'rgba(1,5,5,.91)';darkCtx.fillRect(0,0,map.w,map.h);
+ darkCtx.globalCompositeOperation='destination-out';const ang=player.angle,range=generatorOn?670:470,half=generatorOn?.62:.48;
+ darkCtx.save();darkCtx.beginPath();darkCtx.moveTo(player.x,player.y);darkCtx.arc(player.x,player.y,range,ang-half,ang+half);darkCtx.closePath();const beam=darkCtx.createRadialGradient(player.x,player.y,24,player.x,player.y,range);beam.addColorStop(0,'rgba(0,0,0,.99)');beam.addColorStop(.68,'rgba(0,0,0,.88)');beam.addColorStop(1,'rgba(0,0,0,.25)');darkCtx.fillStyle=beam;darkCtx.fill();darkCtx.restore();
+ const glow=darkCtx.createRadialGradient(player.x,player.y,2,player.x,player.y,90);glow.addColorStop(0,'rgba(0,0,0,1)');glow.addColorStop(1,'rgba(0,0,0,0)');darkCtx.fillStyle=glow;darkCtx.beginPath();darkCtx.arc(player.x,player.y,90,0,Math.PI*2);darkCtx.fill();darkCtx.restore();ctx.drawImage(darkCanvas,0,0);
+ // Subtle horror vignette and intermittent power flicker; keep gameplay readable.
+ const vignette=ctx.createRadialGradient(W*.5,H*.5,Math.min(W,H)*.18,W*.5,H*.5,Math.max(W,H)*.72);vignette.addColorStop(0,'rgba(0,0,0,0)');vignette.addColorStop(1,'rgba(0,0,0,.42)');ctx.fillStyle=vignette;ctx.fillRect(0,0,W,H);if(alarmTimer>0&&Math.sin(clock*18)>0){ctx.fillStyle='rgba(255,40,40,.09)';ctx.fillRect(0,0,W,H)}else if(!generatorOn&&Math.sin(clock*2.7)>0.985){ctx.fillStyle='rgba(180,220,205,.035)';ctx.fillRect(0,0,W,H)}
+ // Weapon drops remain visibly marked through the darkness so players can locate them.
+
+ weaponDrops.filter(q=>q.floor===floorLevel).forEach(q=>{if(q.got)return;ctx.save();ctx.globalAlpha=.98;ctx.shadowColor='#ffe37a';ctx.shadowBlur=22;ctx.fillStyle='#ffe37a';ctx.beginPath();ctx.arc(q.x,q.y,13+Math.sin(clock*4)*2,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;ctx.fillStyle='#18231a';ctx.fillRect(q.x-13,q.y-4,26,8);ctx.fillRect(q.x-5,q.y-8,11,5);ctx.fillStyle='#fff8ce';ctx.font='bold 15px system-ui';ctx.textAlign='center';ctx.fillText('⬇ '+q.label,q.x,q.y-23);ctx.restore()});
+ // 수류탄: 폭발 전에는 깜박이는 작은 원으로 표시
+ grenadeObjects.filter(g=>g.floor===floorLevel).forEach(g=>{ctx.save();ctx.fillStyle=g.fuse<.35?'#ff654b':'#d6c77b';ctx.shadowColor=ctx.fillStyle;ctx.shadowBlur=12;ctx.beginPath();ctx.arc(g.x,g.y,7+Math.sin(clock*18)*2,0,Math.PI*2);ctx.fill();ctx.restore()});
+
+ // 플레이어: 월드 좌표에서 한 번만 렌더링
+ ctx.save();ctx.translate(player.x,player.y);ctx.rotate(player.angle);ctx.shadowColor='#000';ctx.shadowBlur=4;ctx.fillStyle='#071310';ctx.beginPath();ctx.arc(0,0,9,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;ctx.strokeStyle='#62f4d2';ctx.lineWidth=1.5;ctx.stroke();ctx.fillStyle='#f7fff4';ctx.beginPath();ctx.arc(0,0,5.5,0,Math.PI*2);ctx.fill();ctx.fillStyle='#1a9c86';ctx.fillRect(-2,-3,8,6);ctx.fillStyle='#fff3c4';ctx.fillRect(4,-2,13,4);ctx.restore();
+ ctx.restore(); // 월드 좌표 종료
+ // 이하 HUD는 화면 좌표로 그린다
+ ctx.setTransform(dpr,0,0,dpr,0,0);ctx.globalAlpha=1;ctx.shadowBlur=0;
+ const cx=W/2+Math.cos(player.angle)*95,cy=H/2+Math.sin(player.angle)*95;ctx.strokeStyle='#e4f2cc';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(cx,cy,7,0,Math.PI*2);ctx.moveTo(cx-13,cy);ctx.lineTo(cx-5,cy);ctx.moveTo(cx+5,cy);ctx.lineTo(cx+13,cy);ctx.moveTo(cx,cy-13);ctx.lineTo(cx,cy-5);ctx.moveTo(cx,cy+5);ctx.lineTo(cx,cy+13);ctx.stroke();
+ if(extractTimer>0){ctx.fillStyle='#07100ee8';ctx.fillRect(W/2-120,H-120,240,24);ctx.strokeStyle='#b8c9a0';ctx.strokeRect(W/2-120,H-120,240,24);ctx.fillStyle='#9fe7a7';ctx.fillRect(W/2-116,H-116,232*(1-extractTimer/5),16);ctx.fillStyle='#f3f3d9';ctx.font='bold 11px system-ui';ctx.textAlign='center';ctx.fillText('탈출 신호 유지: '+extractTimer.toFixed(1)+'초',W/2,H-103)}
+ if(toastTime>0){ctx.fillStyle='#07100ee8';ctx.fillRect(Math.max(8,W/2-180),H-78,Math.min(360,W-16),34);ctx.strokeStyle='#b8c9a0';ctx.strokeRect(Math.max(8,W/2-180),H-78,Math.min(360,W-16),34);ctx.fillStyle='#f3f3d9';ctx.font='bold 12px system-ui';ctx.textAlign='center';ctx.fillText(toast,W/2,H-57)}
+ ctx.fillStyle='#09110fe8';ctx.fillRect(W/2-45,H-28,90,20);ctx.fillStyle='#dbe9d5';ctx.font='10px system-ui';ctx.textAlign='center';ctx.fillText('방향 '+Math.round((player.angle*180/Math.PI+360)%360)+'°',W/2,H-14);
+}
+
+let last=0,renderError='';function loop(t){let dt=Math.min(.04,(t-last)/1000||0);last=t;try{update(dt);draw()}catch(err){if(!renderError){renderError=String(err&&err.message||err);console.error(err)}ctx.setTransform(dpr,0,0,dpr,0,0);ctx.fillStyle='#101b1d';ctx.fillRect(0,0,W,H);ctx.fillStyle='#fff';ctx.font='bold 16px system-ui';ctx.textAlign='center';ctx.fillText('화면을 그리는 중 오류가 발생했어요',W/2,H/2-12);ctx.font='12px system-ui';ctx.fillText(renderError.slice(0,90),W/2,H/2+16)}requestAnimationFrame(loop)}reset();requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

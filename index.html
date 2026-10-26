@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0b1020">
+<title>수학 게임 CD 모음</title>
+<style>
+:root{color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;min-height:100dvh;background:radial-gradient(ellipse at 50% -20%,#2a2f5a,#0b1020 60%);color:#f2f5ff;font-family:system-ui,-apple-system,"Malgun Gothic",sans-serif;padding:28px 16px 40px}
+.wrap{max-width:760px;margin:0 auto}
+header{text-align:center;margin-bottom:24px}
+.eyebrow{font-size:12px;letter-spacing:.25em;color:#9fb0d8;font-weight:800}
+h1{font-size:clamp(26px,6vw,38px);margin:6px 0 6px}
+.sub{margin:0;color:#aab6d3;font-size:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
+@media(max-width:360px){.grid{grid-template-columns:1fr}}
+.card{display:flex;gap:16px;align-items:center;padding:16px;border-radius:18px;background:#151b33;border:1px solid #2c3660;text-decoration:none;color:inherit;transition:transform .15s,border-color .15s}
+.card:hover,.card:focus-visible{transform:translateY(-2px);border-color:var(--c)}
+.card:hover .disc{transform:rotate(40deg)}
+.disc{flex:none;width:86px;height:86px;border-radius:50%;position:relative;transition:transform .5s;background:conic-gradient(from 0deg,#fff3,transparent 15%,#fff2 30%,transparent 45%,#fff3 60%,transparent 75%,#fff2 90%),radial-gradient(circle,var(--c) 0 34%,var(--c2) 70%,var(--c) 100%);box-shadow:0 6px 18px #0008,inset 0 0 0 2px #ffffff30}
+.disc::after{content:"";position:absolute;left:50%;top:50%;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;background:#0b1020;box-shadow:0 0 0 5px #ffffff40}
+.disc span{position:absolute;inset:0;display:grid;place-items:center;font-size:19px;transform:translateY(-27px)}
+.info h2{font-size:18px;margin:0 0 4px}
+.info p{margin:0 0 8px;color:#b8c3e0;font-size:13px;line-height:1.5}
+.tags{display:flex;gap:5px;flex-wrap:wrap}
+.tags b{font-size:11px;font-weight:700;padding:3px 8px;border-radius:99px;background:#232c52;color:#d7e0ff}
+footer{text-align:center;margin-top:26px;color:#7f8bb0;font-size:12px}
+</style>
+</head>
+<body>
+<div class="wrap">
+ <header>
+  <div class="eyebrow">MATH GAME COLLECTION</div>
+  <h1>💿 수학 게임 CD 모음</h1>
+  <p class="sub">하고 싶은 게임을 눌러 보세요!</p>
+ </header>
+ <main class="grid">
+  <a class="card" href="battle.html" style="--c:#36c5f0;--c2:#ff627f">
+   <div class="disc"><span>⚔️</span></div>
+   <div class="info"><h2>수학 난투: 아레나</h2><p>친구와 1:1 검 대결! 문제를 먼저 맞히면 체력 회복.</p><div class="tags"><b>2인</b><b>3판 2선승</b><b>분수·비율·부피</b></div></div>
+  </a>
+  <a class="card" href="maze.html" style="--c:#ff4d6d;--c2:#4a1d3a">
+   <div class="disc"><span>🔔</span></div>
+   <div class="info"><h2>수학 탈출: 마지막 종소리</h2><p>열쇠 3개를 모아 미로를 탈출! 선생님을 피해라.</p><div class="tags"><b>1인</b><b>미로</b><b>계산·도형</b></div></div>
+  </a>
+  <a class="card" href="last-signal.html" style="--c:#cce8b0;--c2:#2f4a3a">
+   <div class="disc"><span>📡</span></div>
+   <div class="info"><h2>LAST SIGNAL</h2><p>열쇠를 찾고 발전기 문제를 풀어 헬기로 탈출!</p><div class="tags"><b>1인</b><b>초보·보통 모드</b><b>생존</b></div></div>
+  </a>
+  <a class="card" href="https://school-defense-math-day-2026.plum-ball-7624.chatgpt.site/" style="--c:#ffd166;--c2:#7a4b00">
+   <div class="disc"><span>🏫</span></div>
+   <div class="info"><h2>학교 디펜스</h2><p>유닛을 뽑고 합쳐서 학교를 지켜라! 확률표를 잘 읽어 봐요.</p><div class="tags"><b>1인</b><b>디펜스</b><b>확률</b></div></div>
+  </a>
+ </main>
+ <footer>우리 학교 수학 게임 부스 · 집에서도 다시 플레이할 수 있어요</footer>
+</div>
+</body>
+</html>
