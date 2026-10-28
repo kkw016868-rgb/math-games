@@ -23,6 +23,11 @@ button.kbsel{outline:3px solid #ffe17a;outline-offset:3px}.navhint{display:block
 @media (hover:hover) and (pointer:fine){#controls{display:none}}
 @media(max-width:620px){#keybar{font-size:12px;gap:4px}kbd{min-width:22px;font-size:12px;padding:3px 5px}}
 .more-games{display:block;margin-top:14px;color:#9fdcff;font-size:13px;font-weight:800;text-decoration:none}
+/* 가독성: 전반적으로 글씨를 키우고 대비를 높인다 */
+h1{font-size:clamp(20px,3vw,28px)}#sub{font-size:15px;color:#c3d1e8}.pill{font-size:17px;padding:9px 15px}.panel{max-width:560px}.panel p{font-size:17px;line-height:1.7;color:#e6eefb}.panel h2{font-size:clamp(28px,4.5vw,38px)}button{font-size:17px}.ctrl.action small{font-size:13px;color:#eef3ff}#hint{font-size:16px;color:#d5e0f2;min-height:20px}
+#keybar{font-size:17px}kbd{font:900 17px/1.1 Inter,system-ui,sans-serif;min-width:34px}.navhint{font-size:16px}.more-games{font-size:16px}
+.bagNote{font-size:16px;color:#c9d6ea}.bagSection{font-size:15px;color:#c0d0e6}.giftTile,.allyTile{font-size:16px}.allyTile small{font-size:14px;color:#cdd9ea}.releaseBtn{font-size:14px}.bagHead h2{font-size:27px}
+@media(max-width:620px){#sub{font-size:13px}.pill{font-size:14px;padding:6px 10px}.panel p{font-size:15px}#keybar{font-size:14px}kbd{font-size:14px;min-width:26px}#hint{font-size:14px}.ctrl.action small{font-size:11px}}
 </style>
 </head>
 <body>
@@ -42,9 +47,12 @@ button.kbsel{outline:3px solid #ffe17a;outline-offset:3px}.navhint{display:block
 </div>
 <div id="hint">친구에게 E키로 선물을 주면 동료가 돼요 · 수학 장치 앞에서는 숫자키 1·2·3을 눌러요.</div>
 </div>
+<script src="sound.js" data-btn="bottom:10px;left:10px"></script>
 <script>
 (()=>{
 const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');
+// 가독성: 캔버스의 작은 글씨(18px 이하)를 일괄 30% 키운다.
+{const fontDesc=Object.getOwnPropertyDescriptor(CanvasRenderingContext2D.prototype,'font');Object.defineProperty(ctx,'font',{get(){return fontDesc.get.call(this)},set(v){fontDesc.set.call(this,String(v).replace(/(\d+(?:\.\d+)?)px/,(m,n)=>(+n<=18?Math.round(n*1.3):+n)+'px'))}})}
 const overlay=document.getElementById('overlay'),ovTitle=document.getElementById('ovTitle'),ovText=document.getElementById('ovText'),startBtn=document.getElementById('startBtn'),resetBtn=document.getElementById('resetBtn');
 const stagePill=document.getElementById('stagePill'),hpPill=document.getElementById('hpPill'),friendPill=document.getElementById('friendPill'),hint=document.getElementById('hint');
 const bagOverlay=document.getElementById('bagOverlay'),bagClose=document.getElementById('bagClose'),giftGrid=document.getElementById('giftGrid'),allyList=document.getElementById('allyList');
@@ -115,7 +123,6 @@ function makeStage(i){
      // Alternate pits and planet hazards, keeping math gates and friends clear.
      for(let x=z.start+520,n=0;x<z.end-200;x+=470,n++){if(nearStation(x)||nearStation(x+120)||nearFriend(x))continue;
        if(n%2===0)world.pits.push({x,w:80+zi*12});else world.hazards.push({x,w:48,type:['thorns','iceSpikes','geyser'][zi],phase:n%5})}
-     if(z.theme!=='lava')for(let x=z.start+250,n=0;x<z.end-150;x+=310,n++){if(n%3===1&&!nearStation(x)&&!nearStation(x+120))world.platforms.push({x:x+20,y:H*.65-(n%2)*22,w:100,h:15})}
      for(let x=z.start+380,n=0;x<z.end-150;x+=380,n++){if(nearStation(x)||nearFriend(x))continue;const hp=2+zi;world.enemies.push({x,y:0,w:32,h:28,vx:(n%2?-1:1)*(48+zi*16),hp,maxHp:hp,kind:n%3===2?'ranged':'chaser',variant:n%3,shotCd:1+n*.2,alive:true,lo:x-70,hi:x+95,diff:zi})}
    });
  }else if(i===1){
@@ -132,7 +139,6 @@ function makeStage(i){
  }else{
    world.stations=POTION_GATES.map(g=>({type:'potion',x:g.x,gateX:g.x+150,solved:false,target:g.target,ops:g.ops}));
    SCHOOL_ZONES.forEach((z,zi)=>{if(z.schoolType==='office')return;
-     for(let x=z.start+280,n=0;x<z.end-150;x+=320,n++){if(n%3!==1&&!nearStation(x+25)&&!nearStation(x+140))world.platforms.push({x:x+25,y:H*(n%2?.61:.52),w:115,h:14})}
      if(z.enemy)for(let x=z.start+370,n=0;x<z.end-150;x+=330,n++){if(!nearStation(x))world.enemies.push({x,y:0,w:36,h:42,vx:n%2?-30:30,hp:zi>=3?4:3,maxHp:zi>=3?4:3,kind:z.enemy,variant:n%4,shotCd:1.2+n*.25,alive:true,lo:x-45,hi:x+50,diff:5})}
    });
    world.pits=[{x:10510,w:52},{x:10960,w:58},{x:11410,w:54}];
@@ -164,10 +170,10 @@ function releaseCompanion(index){const c=companions.splice(index,1)[0];if(!c)ret
 bagClose.addEventListener('click',closeBag);allyList.addEventListener('click',e=>{const b=e.target.closest?.('[data-release]');if(b)releaseCompanion(Number(b.dataset.release))});
 function showOverlay(title,text,primary,secondary,mode){ovTitle.textContent=title;ovText.innerHTML=text+'<span class="navhint">← → 로 고르고 Enter 로 선택</span>';startBtn.textContent=primary;resetBtn.textContent=secondary||'';resetBtn.classList.toggle('hidden',!secondary);ovMode=mode;overlay.classList.remove('hidden');paused=true;kbIndex=0;markKeyboardSelection()}
 function hideOverlay(){overlay.classList.add('hidden');paused=false;running=true}
-function showTitle(){running=false;won=false;ending=false;endingMode='';keys={};pendingSwap=null;invTab=0;bagOverlay.classList.add('hidden');
+function showTitle(){GameAudio.stop();running=false;won=false;ending=false;endingMode='';keys={};pendingSwap=null;invTab=0;bagOverlay.classList.add('hidden');
  showOverlay('별빛 너머의 친구들','우주 행성을 지나 마왕성을 무찌르고, 수학 선생님과 단산중학교까지 가요!<br>⚖ <b>1스테이지</b> 동료 무게로 저울 맞추기<br>🔫 <b>2스테이지</b> 마왕 HP를 딱 0으로 만들기<br>🧪 <b>3스테이지</b> 비율 물약으로 키 맞추기<br>수학 장치 앞에서는 <b>숫자키 1·2·3</b>을 눌러요.','▶ 시연 모드 (1스테이지)','전체 모드 (3스테이지)','title')}
 function pauseGame(){if(!running||paused||ending)return;showOverlay('⏸ 일시정지','잠깐 쉬어요. 계속하거나 처음 화면으로 돌아갈 수 있어요.','계속하기','처음 화면으로','pause')}
-function restart(mode){gameMode=mode;pendingSwap=null;invTab=0;stageIndex=0;hearts=3;fruit=3;giftBag={apple:2,star:1};scoreFriends.clear();companions=[];won=false;ending=false;endingTime=0;transitioning=false;gameTime=0;wardCooldown=0;shieldEffect=0;contactLock=0;endingMode='';keys={};makeStage(0);hideOverlay();updateHud();updateBag()}
+function restart(mode){gameMode=mode;pendingSwap=null;invTab=0;stageIndex=0;hearts=3;fruit=3;giftBag={apple:2,star:1};scoreFriends.clear();companions=[];won=false;ending=false;endingTime=0;transitioning=false;gameTime=0;wardCooldown=0;shieldEffect=0;contactLock=0;endingMode='';keys={};makeStage(0);hideOverlay();GameAudio.sfx('start');GameAudio.music('space');updateHud();updateBag()}
 startBtn.addEventListener('click',()=>{if(ovMode==='title')restart('demo');else if(ovMode==='pause')hideOverlay();else showTitle()});
 resetBtn.addEventListener('click',()=>{if(ovMode==='title')restart('full');else showTitle()});
 function keyboardButtons(){if(!bagOverlay.classList.contains('hidden'))return [bagClose,...allyList.querySelectorAll('[data-release]')];if(!overlay.classList.contains('hidden'))return [startBtn,resetBtn].filter(b=>!b.classList.contains('hidden'));return []}
@@ -186,8 +192,8 @@ function reviveAfterDefeat(){
 function hitPlayer(direction=0){
  if(invuln>0)return false;
  const wardCount=companions.filter(c=>c.ability==='ward').length;
- if(wardCount&&wardCooldown<=0){wardCooldown=Math.max(2.2,7-(wardCount-1)*2);invuln=.5;shieldEffect=1.15;if(direction){player.vx=direction*180;player.vy=-250}say('🛡️ 동료들의 보호막이 공격을 막았어요!');return false}
- hearts--;invuln=1.35;player.vy=Math.min(player.vy,-300);if(direction)player.vx=direction*220;updateHud();
+ if(wardCount&&wardCooldown<=0){GameAudio.sfx('power');wardCooldown=Math.max(2.2,7-(wardCount-1)*2);invuln=.5;shieldEffect=1.15;if(direction){player.vx=direction*180;player.vy=-250}say('🛡️ 동료들의 보호막이 공격을 막았어요!');return false}
+ hearts--;GameAudio.sfx('hit');invuln=1.35;player.vy=Math.min(player.vy,-300);if(direction)player.vx=direction*220;updateHud();
  if(hearts<=0){reviveAfterDefeat();return true}
  say('앗! 공격을 받았어요. 잠깐 무적 상태예요!');return true
 }
@@ -200,7 +206,7 @@ function interactGift(){if(!running||paused)return;let nearest=null,dist=999;for
 function recruit(f,swapIndex){
  const giftKey=f.fruit==='별열매'?'star':'apple';giftBag[giftKey]--;fruit=Math.max(0,fruit-1);
  let swapped='';if(swapIndex>=0){const old=companions.splice(swapIndex,1)[0];if(old.friendRef)old.friendRef.got=false;swapped=`${old.name}(${old.kg}kg)는 원래 자리로 돌아가고 `}
- f.got=true;scoreFriends.add(f.id);companions.push({name:f.name,color:f.color,look:f.look,kg:f.kg,friendRef:f,x:player.x-42,y:player.groundY,fruit:f.fruit,ability:f.ability,jumpOffset:0,jumpVY:0,jumpAt:0,jumpQueued:false,jumpActive:false});
+ GameAudio.sfx('key');f.got=true;scoreFriends.add(f.id);companions.push({name:f.name,color:f.color,look:f.look,kg:f.kg,friendRef:f,x:player.x-42,y:player.groundY,fruit:f.fruit,ability:f.ability,jumpOffset:0,jumpVY:0,jumpAt:0,jumpQueued:false,jumpActive:false});
  updateHud();updateBag();say(`${swapped}${f.name}(${f.kg}kg)와 친구가 됐어요! ✨ ${abilityLabel(f.ability)} 능력을 얻었어요.`)
 }
 function resolveSwap(index){const f=pendingSwap;pendingSwap=null;paused=false;if(index<0){say(`${f.name}와는 다음에 함께해요. 선물은 그대로 있어요.`);return}recruit(f,index)}
@@ -209,12 +215,12 @@ function jump(){
  const echoCount=companions.filter(c=>c.ability==='echo').length,airborne=!player.onGround;
  if(airborne&&(!echoCount||player.jumpCount>=1+echoCount))return;
  if(!airborne)player.jumpCount=0;
- const isAirJump=airborne;player.vy=isAirJump?-520:-590;player.onGround=false;player.jumpCount++;
+ const isAirJump=airborne;player.vy=isAirJump?-520:-590;player.onGround=false;player.jumpCount++;GameAudio.sfx('jump');
  if(isAirJump)player.airJumpFlash=.34;
  const gap=echoCount?.22:.34;
  companions.forEach((c,i)=>{if(c.jumpQueued||c.jumpActive)return;c.jumpAt=gameTime+gap*(i+1);c.jumpQueued=true})
 }
-function shoot(){if(!running||paused||shootCooldown>0)return;projectiles.push({x:player.face>0?player.x+player.w:player.x-12,y:player.y+player.h*.48,vx:player.face*680,life:1.8,damage:1,ammo:stageIndex===1?currentAmmo()[ammo]:null});shootCooldown=.24}
+function shoot(){if(!running||paused||shootCooldown>0)return;GameAudio.sfx('click');projectiles.push({x:player.face>0?player.x+player.w:player.x-12,y:player.y+player.h*.48,vx:player.face*680,life:1.8,damage:1,ammo:stageIndex===1?currentAmmo()[ammo]:null});shootCooldown=.24}
 function currentRound(){const b=world&&world.boss;return BOSS_ROUNDS[b&&b.alive&&b.kind==='demon'?b.round:0]}
 function currentAmmo(){return currentRound().ammo}
 // Applies one numbered bullet to a shield door or the demon king; returns true when it lands exactly on 0.
@@ -255,7 +261,7 @@ function mathKey(n){
    if(r>=0){st.sel.splice(r,1);if(st.mode==='both')st.left.push(c)}else if(l>=0)st.left.splice(l,1);else st.sel.push(c);
    const right=scaleSum(st),leftTotal=st.target+scaleLeft(st),rp=scaleText(st.sel)||'0',lp=st.left.length?`${st.target} + ${scaleText(st.left)}`:`${st.target}`;
    const where=st.sel.includes(c)?'오른쪽에 올렸어요':st.left.includes(c)?'왼쪽(돌 쪽)에 올렸어요':'내렸어요';
-   if(right===leftTotal){st.solved=true;st.sel=[];st.left=[];floater(`${lp} = ${rp} ✔`,st.x,H*.79-190,'#9df5d8');say(`⚖ 왼쪽 ${lp} = 오른쪽 ${rp}! 균형이 맞아서 저울 문이 열렸어요!`)}
+   if(right===leftTotal){GameAudio.sfx('correct');st.solved=true;st.sel=[];st.left=[];floater(`${lp} = ${rp} ✔`,st.x,H*.79-190,'#9df5d8');say(`⚖ 왼쪽 ${lp} = 오른쪽 ${rp}! 균형이 맞아서 저울 문이 열렸어요!`)}
    else say(`${c.name}를 ${where}. 왼쪽 ${lp} = ${leftTotal}kg · 오른쪽 ${rp} = ${right}kg → ${right>leftTotal?'오른쪽이 무거워요':'왼쪽이 무거워요'}`);
  }else{
    const [num,den,label]=st.ops[n],next=heightCm*num/den;
@@ -263,7 +269,7 @@ function mathKey(n){
    if(next>360){say(`${heightCm} ${label} = ${next}cm · 너무 커서 천장에 닿아요! R키로 원래 키로 돌아가요.`);return}
    if(next<20){say(`${heightCm} ${label} = ${next}cm · 너무 작아져요! R키로 원래 키로 돌아가요.`);return}
    floater(`${heightCm} ${label} = ${next}cm`,player.x+player.w/2,player.y-20,next===st.target?'#9df5d8':'#ffe17a');
-   setHeight(next);say(next===st.target?`키 ${next}cm! 문의 키와 같아요. 문으로 가세요!`:`키가 ${next}cm가 됐어요. 문은 ${st.target}cm만 통과해요.`)
+   if(next===st.target)GameAudio.sfx('correct');setHeight(next);say(next===st.target?`키 ${next}cm! 문의 키와 같아요. 문으로 가세요!`:`키가 ${next}cm가 됐어요. 문은 ${st.target}cm만 통과해요.`)
  }
 }
 function resetHeight(){if(!running||paused||stageIndex!==2||heightCm===BASE_HEIGHT)return;setHeight(BASE_HEIGHT);say('원래 키 120cm로 돌아왔어요.')}
@@ -301,7 +307,7 @@ function save(){try{localStorage.setItem('starlight-save',JSON.stringify({stageI
 function startEnding(){ending=true;endingMode='earth';endingTime=0;won=false;running=true;paused=false;transitioning=false;bagOverlay.classList.add('hidden');projectiles=[];enemyShots=[];bossShots=[];say('우주선에 탑승했어요. 지구로 귀환합니다!')}
 function startSchoolAdventure(){ending=false;endingMode='';endingTime=0;keys={};makeStage(2);running=true;paused=false;overlay.classList.add('hidden')}
 function finishGame(){
- won=true;running=false;paused=true;ending=false;endingMode='';save();
+ won=true;running=false;paused=true;ending=false;endingMode='';save();GameAudio.stop();GameAudio.sfx('win');
  if(gameMode==='demo')showOverlay('🎉 시연 모드 클리어!','우주 행성 여행을 모두 마쳤어요!<br>동료 '+companions.length+'명과 함께 ⚖ 저울 문 '+world.stations.length+'개를 열었어요.<br>전체 모드에서는 마왕성과 단산중학교가 기다려요.','처음 화면으로',null,'clear');
  else showOverlay('🎓 클리어!','우주 → 마왕성 → 단산중학교 모험을 모두 마쳤어요!<br>⚖ 저울 · 🔫 마왕 HP 0 · 🧪 비율 물약을 모두 해냈어요.<br>동료 '+companions.length+'명과 함께 무사히 도착했어요.','처음 화면으로',null,'clear')
 }
@@ -684,11 +690,12 @@ function draw(){
  if(pendingSwap)drawSwapPrompt();
  for(const f of floaters){const x=f.x-cam,y=Math.max(f.y,150)-f.t*28;ctx.globalAlpha=Math.max(0,1-f.t/2.4);ctx.font='900 24px system-ui';ctx.textAlign='center';ctx.lineWidth=5;ctx.strokeStyle='#0a1222';ctx.strokeText(f.text,x,y);ctx.fillStyle=f.color;ctx.fillText(f.text,x,y);ctx.textAlign='left';ctx.globalAlpha=1}
  // toast
- if(toastTime>0){ctx.font='bold 13px system-ui';const tw=Math.min(W-24,ctx.measureText(toast).width+28);roundRect((W-tw)/2,H-45,tw,30,10,'#091326dd','#52678b');ctx.fillStyle='#fff';ctx.textAlign='center';ctx.fillText(toast,W/2,H-25);ctx.textAlign='left'}
+ if(toastTime>0){ctx.font='bold 13px system-ui';const tw=Math.min(W-24,ctx.measureText(toast).width+28);roundRect((W-tw)/2,H-52,tw,38,10,'#091326ee','#52678b');ctx.fillStyle='#fff';ctx.textAlign='center';ctx.fillText(toast,W/2,H-27);ctx.textAlign='left'}
 }
 let last=performance.now();function loop(now){const dt=Math.min(.033,(now-last)/1000);last=now;update(dt);draw();requestAnimationFrame(loop)}requestAnimationFrame(loop);
 makeStage(0);
 showTitle();
+window.__dbg={get world(){return world},get player(){return player},get keys(){return keys},get companions(){return companions},get stageIndex(){return stageIndex},get hearts(){return hearts},get running(){return running},get paused(){return paused},get heightCm(){return heightCm},get projectiles(){return projectiles},get ending(){return ending},get ammo(){return ammo},restart,update,draw};
 })();
 </script>
 </body>
