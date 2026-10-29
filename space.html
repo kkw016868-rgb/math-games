@@ -22,7 +22,7 @@ button{border:1px solid #ffffff2a;background:linear-gradient(140deg,#253959,#172
 kbd{display:inline-block;min-width:30px;padding:4px 8px;border-radius:8px;background:linear-gradient(#f4f7ff,#cfd9ee);color:#14203a;font:900 15px/1.1 Inter,system-ui,sans-serif;text-align:center;box-shadow:0 3px 0 #7d8db0,0 4px 8px #0006;border:1px solid #fff}
 #kbMath{background:#2a2558;border:1px solid #9a8cff66;color:#c9c2ff}#kbMath.on{background:linear-gradient(135deg,#7867f5,#5142bd);color:#fff;box-shadow:0 0 0 2px #ffe17a,0 0 18px #9a8cffaa;animation:kbPulse .8s infinite alternate}@keyframes kbPulse{to{transform:scale(1.05)}}
 button.kbsel{outline:3px solid #ffe17a;outline-offset:3px}.navhint{display:block;font-size:13px;color:#ffe17a;margin-top:10px}.releaseBtn kbd{min-width:20px;padding:2px 5px;font-size:11px}
-@media (hover:hover) and (pointer:fine){#controls{display:none}}
+body.touch-off #controls,body.touch-off #mathbar,body.touch-off #pauseBtn{display:none!important}body.touch-on #keybar,body.touch-on .navhint{display:none}.modeBtn{cursor:pointer;color:#fff;font:inherit;font-weight:800}.modeBtn.on{background:linear-gradient(135deg,#7867f5,#5142bd);border-color:#c8c0ff70}#pauseBtn{position:absolute;top:8px;right:58px;z-index:3;width:44px;height:44px;padding:0;border-radius:50%;font-size:18px;background:#0b1220cc}#mathbar{position:absolute;left:50%;top:118px;transform:translateX(-50%);z-index:3;display:flex;justify-content:center;gap:6px;width:min(580px,calc(100% - 16px))}#mathbar button{min-width:64px;min-height:46px;padding:6px 10px;font-size:16px;border-radius:13px;background:linear-gradient(135deg,#3a3380,#262058);border-color:#9a8cff88;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;user-select:none;-webkit-user-select:none}#mathbar button b{display:inline-block;min-width:20px;margin-right:4px;border-radius:6px;background:#f4f7ff;color:#14203a}#mathbar button.sel{box-shadow:0 0 0 2px #ffe17a}#mathbar button:disabled{opacity:.4}#mathbar .reset{background:linear-gradient(135deg,#2c4a5c,#1c3140)}#mathbar button{flex:1 1 0;min-width:0}@media(max-width:620px){#mathbar{gap:4px}#mathbar button{font-size:14px;padding:6px 4px}}@media(max-height:500px){#mathbar{top:auto;bottom:8px}body.touch-on #sub{display:none}}
 @media(max-width:620px){#keybar{font-size:12px;gap:4px}kbd{min-width:22px;font-size:12px;padding:3px 5px}}
 .more-games{display:block;margin-top:14px;color:#9fdcff;font-size:13px;font-weight:800;text-decoration:none}
 /* 가독성: 전반적으로 글씨를 키우고 대비를 높인다 */
@@ -30,15 +30,17 @@ h1{font-size:clamp(20px,3vw,28px)}#sub{font-size:15px;color:#c3d1e8}.pill{font-s
 #keybar{font-size:17px}kbd{font:900 17px/1.1 Inter,system-ui,sans-serif;min-width:34px}.navhint{font-size:16px}.more-games{font-size:16px}
 .bagNote{font-size:16px;color:#c9d6ea}.bagSection{font-size:15px;color:#c0d0e6}.giftTile,.allyTile{font-size:16px}.allyTile small{font-size:14px;color:#cdd9ea}.releaseBtn{font-size:14px}.bagHead h2{font-size:27px}
 @media(max-width:620px){#sub{font-size:13px}.pill{font-size:14px;padding:6px 10px}.panel p{font-size:15px}#keybar{font-size:14px}kbd{font-size:14px;min-width:26px}#hint{font-size:14px}.ctrl.action small{font-size:11px}}
-@media (hover:none) and (pointer:coarse){#keybar{display:none}}
+
 </style>
 </head>
 <body>
 <div id="app">
-<header><div><h1>✨ 별빛 너머의 친구들</h1><div id="sub">행성을 탐험하고, 친구와 함께 모든 스테이지를 클리어하세요!</div></div><div id="hud"><span class="pill" id="stagePill">1 / 3 스테이지</span><span class="pill" id="hpPill">❤️❤️❤️</span><span class="pill" id="friendPill">👽 친구 0/9</span></div></header>
+<header><div><h1>✨ 별빛 너머의 친구들</h1><div id="sub">행성을 탐험하고, 친구와 함께 모든 스테이지를 클리어하세요!</div></div><div id="hud"><span class="pill" id="stagePill">1 / 3 스테이지</span><span class="pill" id="hpPill">❤️❤️❤️</span><span class="pill" id="friendPill">👽 친구 0/9</span><button class="pill modeBtn" id="modeBtn" type="button"></button></div></header>
 <div id="keybar"><span><kbd>←</kbd><kbd>→</kbd> 이동</span><span><kbd>Space</kbd> 점프</span><span><kbd>F</kbd> 쏘기</span><span><kbd>E</kbd> 선물</span><span><kbd>B</kbd> 아이템</span><span id="kbMath"><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd> <b id="kbMathLabel">수학 장치 앞에서</b></span><span><kbd>Esc</kbd> 멈춤</span></div>
 <div id="gamewrap">
 <canvas id="game" aria-label="플랫폼 게임"></canvas>
+<button id="pauseBtn" type="button" aria-label="멈춤">⏸</button>
+<div id="mathbar" class="hidden"><button type="button" data-math="0"></button><button type="button" data-math="1"></button><button type="button" data-math="2"></button><button type="button" class="reset hidden" data-reset>↺ 원래 키</button></div>
 <div id="overlay"><div class="panel"><h2 id="ovTitle">별빛 너머의 친구들</h2><p id="ovText">숲과 얼음 행성을 지나 마왕성으로 들어가세요. 마왕의 공격을 피하고 약해졌을 때 총으로 맞혀야 해요.<br>마왕을 쓰러뜨린 뒤 지구에 돌아오면 수학 선생님과 함께 단산중학교, 운동장, 3학년반, 과학실, 음악실, 교무실 순서로 모험을 이어가세요.<br><b>이동:</b> ← → · <b>점프:</b> Space / ↑ · <b>쏘기:</b> F · <b>가방:</b> B 또는 화면 버튼</p><div class="rowbtn"><button class="primary" id="startBtn">게임 시작</button><button id="resetBtn">처음부터</button></div><a class="more-games" href="index.html">🎮 다른 게임들</a></div></div>
 </div>
 <div id="bagOverlay" class="hidden" role="dialog" aria-modal="true" aria-label="가방">
@@ -50,7 +52,7 @@ h1{font-size:clamp(20px,3vw,28px)}#sub{font-size:15px;color:#c3d1e8}.pill{font-s
 </div>
 <div id="hint">친구에게 E키로 선물을 주면 동료가 돼요 · 수학 장치 앞에서는 숫자키 1·2·3을 눌러요.</div>
 </div>
-<script src="sound.js" data-btn="bottom:10px;left:10px"></script>
+<script src="sound.js" data-btn="top:10px;right:10px"></script>
 <script src="tracker.js" data-game="space"></script>
 <script>
 (()=>{
@@ -61,6 +63,13 @@ const overlay=document.getElementById('overlay'),ovTitle=document.getElementById
 const stagePill=document.getElementById('stagePill'),hpPill=document.getElementById('hpPill'),friendPill=document.getElementById('friendPill'),hint=document.getElementById('hint');
 const bagOverlay=document.getElementById('bagOverlay'),bagClose=document.getElementById('bagClose'),giftGrid=document.getElementById('giftGrid'),allyList=document.getElementById('allyList');
 const keybarMath=document.getElementById('kbMath'),keybarMathLabel=document.getElementById('kbMathLabel');
+const modeBtn=document.getElementById('modeBtn'),pauseBtn=document.getElementById('pauseBtn'),mathbar=document.getElementById('mathbar'),mathBtns=[...mathbar.querySelectorAll('[data-math]')],mathReset=mathbar.querySelector('[data-reset]');
+// Touch buttons default on for phones/tablets; the header button switches modes and the choice is remembered. The keyboard works in both modes.
+let touchMode=matchMedia('(hover:none) and (pointer:coarse)').matches;try{const v=localStorage.getItem('starlight-touch');if(v)touchMode=v==='1'}catch(e){}
+function applyTouchMode(){document.body.classList.toggle('touch-on',touchMode);document.body.classList.toggle('touch-off',!touchMode);modeBtn.classList.toggle('on',touchMode);modeBtn.textContent=touchMode?'📱 모바일 버튼 켜짐':'⌨️ 키보드 모드';modeBtn.title=touchMode?'누르면 키보드 모드로 바꿔요':'누르면 화면에 모바일 버튼이 나와요'}
+// The mute button sits in the game's top-right corner so it never covers the HUD or the touch pads.
+{const snd=[...document.body.children].find(b=>b.tagName==='BUTTON'&&/^소리/.test(b.title));if(snd){snd.style.cssText+=';position:absolute;z-index:5;top:8px;right:8px;bottom:auto;left:auto';document.getElementById('gamewrap').appendChild(snd)}}
+modeBtn.addEventListener('click',()=>{touchMode=!touchMode;try{localStorage.setItem('starlight-touch',touchMode?'1':'0')}catch(e){}applyTouchMode();modeBtn.blur()});applyTouchMode();
 // Three long stages; stage 0 and 2 are built from consecutive zones.
 const SPACE_ZONES=[
  {name:'초록 숲 행성',theme:'forest',sky:'#132d43',ground:'#285a4b',accent:'#75e6a0',start:0,end:5000},
@@ -112,7 +121,7 @@ let W=900,H=500,dpr=1,world=null,player=null,cam=0,keys={},running=false,paused=
 let gameMode='demo',ovMode='title',kbIndex=0,heightCm=BASE_HEIGHT,ammo=0,floaters=[],gateMsgCd=0,pendingSwap=null,invTab=0;
 const gravity=1550;
 function resize(){const r=canvas.getBoundingClientRect();dpr=Math.min(devicePixelRatio||1,2);W=Math.max(320,r.width);H=Math.max(220,r.height);canvas.width=Math.floor(W*dpr);canvas.height=Math.floor(H*dpr);ctx.setTransform(dpr,0,0,dpr,0,0)}
-window.addEventListener('resize',resize);resize();
+window.addEventListener('resize',resize);resize();if(window.ResizeObserver)new ResizeObserver(resize).observe(canvas);
 function zoneAt(x){if(!world||!world.zones)return world;return world.zones.find(z=>x<z.end)||world.zones[world.zones.length-1]}
 function nearStation(x){return world.stations.some(st=>x>st.x-320&&x<st.gateX+60)}
 function makeStage(i){
@@ -277,6 +286,8 @@ function mathKey(n){
  }
 }
 function resetHeight(){if(!running||paused||stageIndex!==2||heightCm===BASE_HEIGHT)return;setHeight(BASE_HEIGHT);say('원래 키 120cm로 돌아왔어요.')}
+mathBtns.forEach((b,i)=>b.addEventListener('click',()=>{mathKey(i);b.blur()}));mathReset.addEventListener('click',()=>{resetHeight();mathReset.blur()});
+pauseBtn.addEventListener('click',()=>{if(pendingSwap)resolveSwap(-1);else pauseGame();pauseBtn.blur()});
 document.querySelectorAll('[data-key]').forEach(b=>{const k=b.dataset.key;b.tabIndex=-1;b.addEventListener('pointerdown',e=>{e.preventDefault();b.setPointerCapture?.(e.pointerId);press(k,true)});['pointerup','pointercancel','lostpointercapture'].forEach(ev=>b.addEventListener(ev,e=>{e.preventDefault();press(k,false)}))});
 // e.code is the physical key, so F/E/B still work with the Korean IME or Caps Lock on.
 const KEYMAP={ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right',ArrowUp:'jump',KeyW:'jump',Space:'jump',KeyF:'shoot',KeyX:'shoot',KeyE:'gift',Enter:'gift',KeyB:'bag'};
@@ -346,7 +357,7 @@ function update(dt){
    const sig=companions.map(c=>c.name).join(',');if(sig!==station.sig)pickScaleTarget(station);
    const goal=station.target===null?0:Math.max(-.32,Math.min(.32,(scaleSum(station)-station.target-scaleLeft(station))*.05));station.ang+=(goal-station.ang)*Math.min(1,dt*5);
  }
- updateKeybar(station);
+ updateKeybar(station);updateMathbar(station);
  if(!blocked&&(keys.left||keys.right)&&Math.abs(player.x-lastPlayerX)<.02)stuckTime+=dt;else stuckTime=0;
  if(stuckTime>.45){const dir=keys.left?-1:1,nextX=Math.max(0,Math.min(world.length-player.w,player.x+dir*14));if(nextX!==player.x){player.x=nextX;player.vx=dir*Math.max(120,Math.abs(player.vx));say('이동을 다시 연결했어요.')}stuckTime=0}
  lastPlayerX=player.x;player.vy+=gravity*dt;player.y+=player.vy*dt;player.onGround=false;
@@ -554,7 +565,16 @@ function drawDemonBoss(b,x){
  if(b.kind==='teacher'){drawMathTeacherBoss(b,x);return}
  ctx.save();ctx.translate(x,b.y);const pulse=1+Math.sin(gameTime*5)*.035;ctx.scale(pulse,1);ctx.fillStyle='#481a3b';ctx.beginPath();ctx.moveTo(10,27);ctx.lineTo(-12,73);ctx.lineTo(3,67);ctx.lineTo(0,94);ctx.lineTo(72,94);ctx.lineTo(69,67);ctx.lineTo(84,73);ctx.lineTo(62,27);ctx.closePath();ctx.fill();ctx.fillStyle='#a53658';ctx.beginPath();ctx.roundRect(8,15,56,70,18);ctx.fill();ctx.fillStyle='#f04d55';ctx.beginPath();ctx.moveTo(12,20);ctx.lineTo(0,-9);ctx.lineTo(25,10);ctx.lineTo(34,-16);ctx.lineTo(43,10);ctx.lineTo(73,-8);ctx.lineTo(60,23);ctx.fill();ctx.fillStyle='#ffe08a';ctx.beginPath();ctx.moveTo(31,9);ctx.lineTo(34,-4);ctx.lineTo(38,9);ctx.fill();ctx.fillStyle='#fff194';ctx.fillRect(18,38,13,7);ctx.fillRect(42,38,13,7);ctx.fillStyle='#4b142e';ctx.fillRect(29,61,18,6);ctx.fillStyle='#ffb361';ctx.beginPath();ctx.moveTo(12,50);ctx.lineTo(-7,39);ctx.lineTo(0,67);ctx.lineTo(16,71);ctx.fill();ctx.beginPath();ctx.moveTo(60,50);ctx.lineTo(79,39);ctx.lineTo(72,67);ctx.lineTo(56,71);ctx.fill();ctx.fillStyle='#b8a0ff';ctx.beginPath();ctx.moveTo(52,54);ctx.lineTo(62,72);ctx.lineTo(54,87);ctx.lineTo(47,68);ctx.fill();ctx.restore()
 }
-let keybarState='';
+let keybarState='',mathbarState='';
+function updateMathbar(station){
+ let labels=null,sel=-1,reset=false;
+ if(stageIndex===1){labels=currentAmmo().map(a=>a.label);sel=ammo}
+ else if(station&&station.type==='scale')labels=[0,1,2].map(i=>companions[i]?`${companions[i].name} ${companions[i].kg}kg`:'');
+ else if(station){labels=station.ops.map(o=>o[2]);reset=true}
+ const state=JSON.stringify([labels,sel,reset]);if(state===mathbarState)return;mathbarState=state;
+ mathbar.classList.toggle('hidden',!labels);if(!labels)return;
+ mathBtns.forEach((b,i)=>{b.innerHTML=`<b>${i+1}</b>${labels[i]||'없음'}`;b.disabled=!labels[i];b.classList.toggle('sel',i===sel)});mathReset.classList.toggle('hidden',!reset)
+}
 function updateKeybar(station){
  const label=stageIndex===1?`총알 고르기 (${currentAmmo().map(a=>a.label).join(' · ')})`:stageIndex===0?(station?'동료를 저울에 올리기':'저울 앞에서 동료 올리기'):(station?'물약 마시기 · R 원래 키':'물약 선반 앞에서 마시기'),on=stageIndex===1||!!station,state=label+on;
  if(state===keybarState)return;keybarState=state;keybarMathLabel.textContent=label;keybarMath.classList.toggle('on',on)
@@ -641,9 +661,9 @@ function drawSwapPrompt(){
  ctx.fillStyle='#050916aa';ctx.fillRect(0,0,W,H);roundRect(x,y,w,h,16,'#111b2df5','#ffe17a');
  ctx.textAlign='center';ctx.fillStyle='#ffe17a';ctx.font='900 18px system-ui';ctx.fillText(`${f.name}(${f.kg}kg)가 함께 가고 싶어해요!`,W/2,y+32);ctx.fillStyle='#fff';ctx.font='bold 14px system-ui';ctx.fillText('누구와 교대할까요? 교대한 동료는 원래 자리로 돌아가요.',W/2,y+56);ctx.textAlign='left';
  const bw=(w-40)/3;companions.forEach((c,i)=>{const bx=x+14+i*(bw+6),by=y+72;roundRect(bx,by,bw,84,10,'#1d2d49','#9a8cff');keycap(bx+8,by+8,String(i+1),22);drawAlien(bx+bw/2-15,by+10,c.look,c.color,.8);ctx.fillStyle='#ffe17a';ctx.font='900 18px system-ui';ctx.textAlign='center';ctx.fillText(c.kg+'kg',bx+bw/2,by+72);ctx.textAlign='left';uiHits.push({kind:'swap',x:bx,y:by,w:bw,h:84,act:()=>resolveSwap(i)})});
- ctx.fillStyle='#a9bbd7';ctx.font='bold 13px system-ui';ctx.textAlign='center';ctx.fillText('[Esc] 지금은 교대하지 않기',W/2,y+h-16);ctx.textAlign='left'
+ ctx.fillStyle='#a9bbd7';ctx.font='bold 13px system-ui';ctx.textAlign='center';ctx.fillText(touchMode?'여기를 누르면 지금은 교대하지 않기':'[Esc] 지금은 교대하지 않기',W/2,y+h-16);ctx.textAlign='left';uiHits.push({kind:'swap',x,y:y+h-38,w,h:38,act:()=>resolveSwap(-1)})
 }
-canvas.addEventListener('pointerdown',e=>{const r=canvas.getBoundingClientRect(),px=e.clientX-r.left,py=e.clientY-r.top;const hit=uiHits.find(h=>(h.kind==='inv'&&invTab||h.kind==='swap'&&pendingSwap)&&px>=h.x&&px<=h.x+h.w&&py>=h.y&&py<=h.y+h.h);if(hit){e.preventDefault();hit.act()}});
+canvas.addEventListener('pointerdown',e=>{if(ending){e.preventDefault();skipEnding();return}const r=canvas.getBoundingClientRect(),px=e.clientX-r.left,py=e.clientY-r.top;const hit=uiHits.find(h=>(h.kind==='inv'&&invTab||h.kind==='swap'&&pendingSwap)&&px>=h.x&&px<=h.x+h.w&&py>=h.y&&py<=h.y+h.h);if(hit){e.preventDefault();hit.act()}});
 function draw(){
  if(ending){if(endingMode==='teacher')drawTeacherIntro();else drawEnding();return}
  ctx.clearRect(0,0,W,H);if(!world){ctx.fillStyle='#0b1223';ctx.fillRect(0,0,W,H);return}
